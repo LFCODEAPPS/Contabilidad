@@ -596,6 +596,9 @@
 
     document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
 
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxahNRdcA7N3swHzduZO9NYUq4NxtGEfN87sEolkkDrUBM70pT-3trB10TaX30pIeM0/exec';
+    const CACHE_KEY = 'cb_cache_v1';
+
     const I18N = {
       es: {
         title: 'Cristian Bautista Contabilidad',
@@ -720,6 +723,7 @@
 
     let mostrarTodos = false;
     let todosMovimientos = [];
+    let catalogos = { metodosPago: [], catIngresos: [], catEgresos: [] };
 
     const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -728,9 +732,9 @@
       document.body.classList.toggle('dark', esOscuro);
       document.body.setAttribute('data-theme-color', prefs.color);
 
-      const computedInk = getComputedStyle(document.body).getPropertyValue('--ink').trim() || '#0e2038';
+      const coloresMeta = { navy: '#0e2038', emerald: '#093b2c', burgundy: '#47121d', slate: '#1e293b' };
       const metaTheme = document.querySelector('meta[name="theme-color"]');
-      if (metaTheme) metaTheme.setAttribute('content', computedInk);
+      if (metaTheme) metaTheme.setAttribute('content', coloresMeta[prefs.color] || '#0e2038');
 
       document.querySelectorAll('[data-theme]').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-theme') === prefs.theme);
@@ -815,10 +819,294 @@
         btn.classList.toggle('active', btn.getAttribute('data-lang') === prefs.lang);
       });
 
-      const tipoActual = document.getElementById('tipo').value;
-      actualizarTextosTipo(tipoActual);
+      actualizarTextosTipo(document.getElementById('tipo').value);
       actualizarBotonesToggle();
     }
 
     function setIdioma(idioma) {
-      prefs.lang =
+      prefs.lang = idioma;
+      localStorage.setItem('cb_lang', idioma);
+      aplicarIdioma();
+      renderGraficos();
+    }
+
+    function actualizarBotonesToggle() {
+      const t = I18N[prefs.lang] || I18N.es;
+      const texto = mostrarTodos ? t.showLess : t.showAll;
+      document.getElementById('btn-toggle-all').textContent = texto;
+      document.getElementById('btn-toggle-all-bottom').textContent = texto;
+    }
+
+    function alternarMostrarTodos() {
+      mostrarTodos = !mostrarTodos;
+      renderHistorial();
+    }
+
+    function abrirConfiguracion() {
+      document.getElementById('settings-modal').classList.add('active');
+    }
+
+    function cerrarConfiguracion() {
+      document.getElementById('settings-modal').classList.remove('active');
+    }
+
+    function cerrarSiFondo(e) {
+      if (e.target.id === 'settings-modal') cerrarConfiguracion();
+    }
+
+    function mostrarBloqueoGuardado(activo) {
+      document.getElementById('saving-overlay').classList.toggle('active', activo);
+    }
+
+    function mostrarVista(vista) {
+      const chartsView = document.getElementById('view-charts');
+      const registrosView = document.getElementById('view-registros');
+      if (vista === 'registros') {
+        chartsView.classList.remove('active');
+        registrosView.classList.add('active');
+      } else {
+        registrosView.classList.remove('active');
+        chartsView.classList.add('active');
+      }
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
+    document.getElementById('fecha').valueAsDate = new Date();
+    const form = document.getElementById('tx-form');
+    const btn = document.getElementById('btn-save');
+    const statusEl = document.getElementById('status');
+
+    function actualizarTextosTipo(tipo) {
+      const t = I18N[prefs.lang] || I18N.es;
+      const tabIn = document.getElementById('tab-ingreso');
+      const tabOut = document.getElementById('tab-egreso');
+      const labelEntidad = document.getElementById('label-entidad');
+      const inputEntidad = document.getElementById('entidad');
+
+      if (tipo === 'Ingreso') {
+        tabIn.className = 'tab active-in';
+        tabOut.className = 'tab';
+        labelEntidad.textContent = t.origin;
+        inputEntidad.placeholder = t.originPh;
+        btn.textContent = t.saveIn;
+      } else {
+        tabOut.className = 'tab active-out';
+        tabIn.className = 'tab';
+        labelEntidad.textContent = t.establishment;
+        inputEntidad.placeholder = t.establishmentPh;
+        btn.textContent = t.saveOut;
+      }
+    }
+
+    function cambiarTipo(tipo) {
+      document.getElementById('tipo').value = tipo;
+      actualizarTextosTipo(tipo);
+      llenarSelect('categoria', tipo === 'Ingreso' ? catalogos.catIngresos : catalogos.catEgresos);
+    }
+
+    function llenarSelect(idSelect, opciones) {
+      const select = document.getElementById(idSelect);
+      const valorPrevio = select.value;
+      select.innerHTML = '';
+      if (!opciones || opciones.length === 0) {
+        select.innerHTML = '<option value="General">Sin datos en hoja</option>';
+        return;
+      }
+      opciones.forEach(op => {
+        const option = document.createElement('option');
+        option.value = op;
+        option.textContent = op;
+        select.appendChild(option);
+      });
+      if (valorPrevio && opciones.includes(valorPrevio)) {
+        select.value = valorPrevio;
+      }
+    }
+
+    function renderHistorial() {
+      const t = I18N[prefs.lang] || I18N.es;
+      const list = document.getElementById('history');
+      const topBtn = document.getElementById('btn-toggle-all');
+      const footer = document.getElementById('history-footer');
+
+      list.innerHTML = '';
+
+      if (todosMovimientos.length === 0) {
+        topBtn.style.display = 'none';
+        footer.style.display = 'none';
+        list.innerHTML = `<li class="item"><span>${t.emptyHist}</span></li>`;
+        return;
+      }
+
+      const hayMas = todosMovimientos.length > prefs.count;
+      topBtn.style.display = hayMas ? 'inline-block' : 'none';
+      footer.style.display = hayMas ? 'flex' : 'none';
+      actualizarBotonesToggle();
+
+      const visibles = mostrarTodos ? todosMovimientos : todosMovimientos.slice(0, prefs.count);
+
+      visibles.forEach(m => {
+        const li = document.createElement('li');
+        li.className = 'item';
+        const isIncome = m.tipo === 'Ingreso';
+        li.innerHTML = `
+          <div class="item-info">
+            <strong>${m.descripcion}</strong>
+            <span>${m.fecha} · ${m.entidad}</span>
+            <span class="badge">${m.categoria} · ${m.metodoPago}</span>
+          </div>
+          <strong class="${isIncome ? 'green' : 'red'}" style="white-space: nowrap;">
+            ${isIncome ? '+' : '-'} S/ ${Number(m.monto || 0).toFixed(2)}
+          </strong>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function renderGrafico(containerId, movimientos, tipo, claseColor) {
+      const t = I18N[prefs.lang] || I18N.es;
+      const container = document.getElementById(containerId);
+      const filtrados = movimientos.filter(m => m.tipo === tipo && Number(m.monto) > 0);
+
+      if (filtrados.length === 0) {
+        const msg = tipo === 'Ingreso' ? t.emptyIn : t.emptyOut;
+        container.innerHTML = `<p class="empty-chart">${msg}</p>`;
+        return;
+      }
+
+      const mapa = {};
+      let totalTipo = 0;
+      filtrados.forEach(m => {
+        const cat = (m.categoria || 'General').trim();
+        const val = Number(m.monto) || 0;
+        mapa[cat] = (mapa[cat] || 0) + val;
+        totalTipo += val;
+      });
+
+      const ordenado = Object.entries(mapa).sort((a, b) => b[1] - a[1]);
+      const maxMonto = ordenado[0][1] || 1;
+
+      container.innerHTML = ordenado.map(([cat, monto]) => {
+        const pctWidth = Math.max(2, (monto / maxMonto) * 100);
+        const pctShare = totalTipo > 0 ? ((monto / totalTipo) * 100).toFixed(1) : '0.0';
+        return `
+          <div class="chart-row">
+            <div class="chart-meta">
+              <span class="chart-label" title="${cat}">${cat}</span>
+              <span class="chart-val ${claseColor === 'in' ? 'green' : 'red'}">S/ ${monto.toFixed(2)} (${pctShare}%)</span>
+            </div>
+            <div class="track">
+              <div class="fill ${claseColor}" style="width: ${pctWidth}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderGraficos() {
+      renderGrafico('chart-in', todosMovimientos, 'Ingreso', 'in');
+      renderGrafico('chart-out', todosMovimientos, 'Egreso', 'out');
+    }
+
+    function aplicarDatosEnPantalla(data) {
+      if (!data || data.status !== 'ok') return;
+
+      catalogos = data.catalogos || { metodosPago: [], catIngresos: [], catEgresos: [] };
+      llenarSelect('metodoPago', catalogos.metodosPago);
+      const tipoActual = document.getElementById('tipo').value;
+      llenarSelect('categoria', tipoActual === 'Ingreso' ? catalogos.catIngresos : catalogos.catEgresos);
+
+      todosMovimientos = data.movimientos || [];
+      let ingresos = 0, egresos = 0;
+      todosMovimientos.forEach(m => {
+        const monto = Number(m.monto) || 0;
+        if (m.tipo === 'Ingreso') ingresos += monto;
+        else egresos += monto;
+      });
+
+      document.getElementById('total-in').textContent = `S/ ${ingresos.toFixed(2)}`;
+      document.getElementById('total-out').textContent = `S/ ${egresos.toFixed(2)}`;
+      document.getElementById('balance').textContent = `S/ ${(ingresos - egresos).toFixed(2)}`;
+
+      renderHistorial();
+      renderGraficos();
+    }
+
+    async function cargarDatos() {
+      const t = I18N[prefs.lang] || I18N.es;
+
+      // Pintar caché al instante si existe
+      try {
+        const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+        if (cached && cached.status === 'ok') {
+          aplicarDatosEnPantalla(cached);
+        }
+      } catch (_) {}
+
+      try {
+        const res = await fetch(SCRIPT_URL);
+        const text = await res.text();
+        const data = JSON.parse(text);
+        if (data.status !== 'ok') {
+          throw new Error(data.message || 'Respuesta inválida del script');
+        }
+        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+        aplicarDatosEnPantalla(data);
+      } catch (err) {
+        if (!localStorage.getItem(CACHE_KEY)) {
+          document.getElementById('history').innerHTML = `<li class="item"><span>${t.connErr}</span></li>`;
+          document.getElementById('chart-in').innerHTML = `<p class="empty-chart">${t.connErr}</p>`;
+          document.getElementById('chart-out').innerHTML = `<p class="empty-chart">${t.connErr}</p>`;
+        }
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const t = I18N[prefs.lang] || I18N.es;
+      btn.disabled = true;
+      mostrarBloqueoGuardado(true);
+      statusEl.textContent = t.savingMsg;
+
+      const payload = {
+        tipo: document.getElementById('tipo').value,
+        fecha: document.getElementById('fecha').value,
+        entidad: document.getElementById('entidad').value.trim(),
+        descripcion: document.getElementById('descripcion').value.trim(),
+        categoria: document.getElementById('categoria').value,
+        metodoPago: document.getElementById('metodoPago').value,
+        monto: document.getElementById('monto').value,
+        observaciones: document.getElementById('observaciones').value.trim()
+      };
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+
+        statusEl.textContent = t.savedOk;
+        document.getElementById('monto').value = '';
+        document.getElementById('entidad').value = '';
+        document.getElementById('descripcion').value = '';
+        document.getElementById('observaciones').value = '';
+        await cargarDatos();
+      } catch (err) {
+        statusEl.textContent = t.saveErr;
+      } finally {
+        mostrarBloqueoGuardado(false);
+        btn.disabled = false;
+        setTimeout(() => statusEl.textContent = '', 3000);
+      }
+    });
+
+    document.querySelectorAll('[data-count]').forEach(b => {
+      b.classList.toggle('active', Number(b.getAttribute('data-count')) === prefs.count);
+    });
+    aplicarTema();
+    aplicarIdioma();
+    cargarDatos();
+  </script>
+</body>
+</html>
