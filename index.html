@@ -3,6 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0e2038">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Contabilidad CB">
+  <link id="favicon-svg" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230e2038'/%3E%3Ccircle cx='256' cy='256' r='164' fill='%23e2f3ec'/%3E%3Ctext x='256' y='318' text-anchor='middle' font-family='system-ui,-apple-system,sans-serif' font-size='240' font-weight='800' fill='%230d7a4e'%3E%24%3C/text%3E%3C/svg%3E">
+  <link id="apple-icon-svg" rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230e2038'/%3E%3Ccircle cx='256' cy='256' r='164' fill='%23e2f3ec'/%3E%3Ctext x='256' y='318' text-anchor='middle' font-family='system-ui,-apple-system,sans-serif' font-size='240' font-weight='800' fill='%230d7a4e'%3E%24%3C/text%3E%3C/svg%3E">
   <title>Cristian Bautista Contabilidad</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,10 +19,14 @@
       --card: #ffffff;
       --ink: #0e2038;
       --ink-2: #16315a;
+      --accent-soft: #f3f6fa;
       --text: #14202f;
       --muted: #5f6f84;
       --line: #dbe1ea;
       --field: #f6f8fb;
+      --placeholder: #98a5b7;
+      --badge-bg: #eaeff6;
+      --badge-text: #3b4d66;
       --green: #0d7a4e;
       --green-soft: #e2f3ec;
       --red: #b3321f;
@@ -24,42 +34,118 @@
       --brass: #c19a4d;
       --radius: 14px;
     }
+
+    body.dark {
+      --bg: #0b121d;
+      --card: #121c2b;
+      --accent-soft: #172336;
+      --text: #edf2f7;
+      --muted: #93a4bc;
+      --line: #233247;
+      --field: #0e1623;
+      --placeholder: #5a6b82;
+      --badge-bg: #1c2a3e;
+      --badge-text: #c2d0e3;
+      --green: #22c55e;
+      --green-soft: rgba(34, 197, 94, 0.16);
+      --red: #f87171;
+      --red-soft: rgba(248, 113, 113, 0.16);
+    }
+
+    body[data-theme-color="emerald"] {
+      --ink: #093b2c;
+      --ink-2: #0f5741;
+      --accent-soft: #eef8f4;
+    }
+    body.dark[data-theme-color="emerald"] {
+      --accent-soft: #102821;
+    }
+
+    body[data-theme-color="burgundy"] {
+      --ink: #47121d;
+      --ink-2: #691b2b;
+      --accent-soft: #faf1f3;
+    }
+    body.dark[data-theme-color="burgundy"] {
+      --accent-soft: #261016;
+    }
+
+    body[data-theme-color="slate"] {
+      --ink: #1e293b;
+      --ink-2: #334155;
+      --accent-soft: #f1f5f9;
+    }
+    body.dark[data-theme-color="slate"] {
+      --accent-soft: #172030;
+    }
+
     * { box-sizing: border-box; font-family: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; touch-action: manipulation; }
     html, body { touch-action: pan-x pan-y; overscroll-behavior-x: none; }
-    body { background: var(--bg); color: var(--text); margin: 0; padding: 0 0 32px; display: flex; justify-content: center; -webkit-font-smoothing: antialiased; }
+    body { background: var(--bg); color: var(--text); margin: 0; padding: 0 0 36px; display: flex; justify-content: center; -webkit-font-smoothing: antialiased; transition: background .2s, color .2s; }
     .container { width: 100%; max-width: 520px; }
 
-    /* Cabecera fija al scroll (encabezado + resumen) */
+    /* Cabecera fija al scroll */
     .sticky-header {
       position: sticky;
       top: 0;
       z-index: 40;
       background: var(--bg);
       padding-bottom: 6px;
+      transition: background .2s;
     }
     .top { background: linear-gradient(180deg, var(--ink) 0%, var(--ink-2) 100%); color: #fff; padding: 18px 18px 48px; border-radius: 0 0 24px 24px; }
-    .header { display: flex; align-items: center; gap: 12px; }
+    .header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .header-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
     .mark { flex: none; width: 40px; height: 40px; border-radius: 10px; border: 1.5px solid var(--brass); color: var(--brass); display: grid; place-items: center; font-weight: 700; font-size: 15px; letter-spacing: 0.5px; }
-    .header h1 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: 0.1px; line-height: 1.2; }
-    .header p { margin: 3px 0 0; font-size: 12px; color: #aebbd0; font-weight: 400; }
+    .header h1 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: 0.1px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .header p { margin: 3px 0 0; font-size: 12px; color: rgba(255,255,255,0.75); font-weight: 400; }
 
-    .summary { margin: -36px 14px 8px; background: var(--card); border-radius: var(--radius); box-shadow: 0 10px 26px rgba(14,32,56,.14); overflow: hidden; display: grid; grid-template-columns: 1fr 1fr; }
+    .btn-gear {
+      flex: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: background .15s, transform .15s;
+    }
+    .btn-gear:hover { background: rgba(255,255,255,0.2); }
+    .btn-gear:active { transform: scale(.94) rotate(25deg); }
+
+    .summary { margin: -36px 14px 8px; background: var(--card); border-radius: var(--radius); box-shadow: 0 10px 26px rgba(0,0,0,.14); overflow: hidden; display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); }
     .box { padding: 12px 16px; text-align: left; min-width: 0; }
     .box small { color: var(--muted); font-size: 12px; display: block; font-weight: 500; }
     .box strong { font-size: 18px; margin-top: 3px; display: block; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -0.2px; }
-    .box.main { grid-column: 1 / -1; background: #f3f6fa; border-bottom: 1px solid var(--line); padding: 14px 16px; }
-    .box.main strong { font-size: 28px; font-weight: 700; color: var(--ink); letter-spacing: -0.6px; }
+    .box.main { grid-column: 1 / -1; background: var(--accent-soft); border-bottom: 1px solid var(--line); padding: 14px 16px; }
+    .box.main strong { font-size: 28px; font-weight: 700; color: var(--text); letter-spacing: -0.6px; }
     .box.in { border-right: 1px solid var(--line); }
     .green { color: var(--green); }
     .red { color: var(--red); }
 
-    /* Botón navegación entre vistas */
+    /* Botones navegación */
     .nav-wrap { margin: 4px 14px 14px; }
-    button.btn-nav { width: 100%; padding: 13px 16px; background: var(--ink); color: #fff; border: none; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(14,32,56,.14); transition: background .15s, transform .1s; }
+    button.btn-nav { width: 100%; padding: 13px 16px; background: var(--ink); color: #fff; border: none; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(0,0,0,.14); transition: background .15s, transform .1s; }
     button.btn-nav:hover { background: var(--ink-2); }
     button.btn-nav:active { transform: scale(.985); }
-    button.btn-secondary { background: var(--card); color: var(--ink); border: 1px solid var(--line); box-shadow: none; }
+    button.btn-secondary { background: var(--card); color: var(--text); border: 1px solid var(--line); box-shadow: none; }
     button.btn-secondary:hover { background: var(--field); }
+
+    .btn-inline-toggle {
+      background: var(--field);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 6px 11px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+    .btn-inline-toggle:hover { background: var(--accent-soft); border-color: var(--ink-2); }
 
     /* Vistas */
     .view { display: none; }
@@ -67,11 +153,12 @@
 
     /* Tarjetas */
     .card { background: var(--card); padding: 18px 16px; border-radius: var(--radius); border: 1px solid var(--line); margin: 0 14px 14px; }
-    .card h2 { margin: 0 0 6px !important; font-size: 16px !important; font-weight: 600; color: var(--ink); }
-    .card-sub { margin: 0 0 14px; font-size: 12px; color: var(--muted); }
+    .card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+    .card h2 { margin: 0 0 4px !important; font-size: 16px !important; font-weight: 600; color: var(--text); }
+    .card-sub { margin: 0; font-size: 12px; color: var(--muted); }
 
     /* Gráficos de barras */
-    .chart-list { display: flex; flex-direction: column; gap: 12px; }
+    .chart-list { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
     .chart-row { display: flex; flex-direction: column; gap: 5px; }
     .chart-meta { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; gap: 8px; }
     .chart-label { font-weight: 500; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -93,8 +180,8 @@
     label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted); }
     input, select { width: 100%; max-width: 100%; min-width: 0; padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 15px; background: var(--field); color: var(--text); transition: border-color .15s, box-shadow .15s, background .15s; }
     input[type="date"] { -webkit-appearance: none; appearance: none; min-height: 44px; line-height: 1.2; }
-    input::placeholder { color: #98a5b7; }
-    input:focus, select:focus { outline: none; border-color: var(--ink-2); background: #fff; box-shadow: 0 0 0 3px rgba(22,49,90,.14); }
+    input::placeholder { color: var(--placeholder); }
+    input:focus, select:focus { outline: none; border-color: var(--ink-2); background: var(--card); box-shadow: 0 0 0 3px rgba(22,49,90,.14); }
     select { appearance: none; -webkit-appearance: none; padding-right: 34px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%235f6f84' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
     #monto { font-weight: 600; font-variant-numeric: tabular-nums; }
     .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
@@ -116,13 +203,172 @@
     .item > strong { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; padding: 3px 8px; border-radius: 8px; }
     .item > strong.green { background: var(--green-soft); }
     .item > strong.red { background: var(--red-soft); }
-    .item-info span.badge, .badge { display: inline-block; background: #eaeff6; color: #3b4d66; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 999px; margin-top: 6px; }
+    .item-info span.badge, .badge { display: inline-block; background: var(--badge-bg); color: var(--badge-text); font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 999px; margin-top: 6px; }
+
+    .history-footer { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); display: flex; justify-content: center; }
+
+    /* Overlay de bloqueo al guardar (símbolo $ verde girando) */
+    .saving-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(11, 18, 29, 0.78);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      user-select: none;
+    }
+    .saving-overlay.active { display: flex; }
+    .saving-box {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 28px 24px;
+      max-width: 320px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,.35);
+    }
+    .dollar-spinner {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: var(--green-soft);
+      border: 3px solid rgba(13, 122, 78, 0.22);
+      color: var(--green);
+      font-size: 40px;
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+      animation: spinDollar 1.1s linear infinite;
+    }
+    @keyframes spinDollar {
+      from { transform: rotateY(0deg); }
+      to { transform: rotateY(360deg); }
+    }
+    .saving-text {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    /* Modal de Configuración */
+    .settings-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(11, 18, 29, 0.6);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .settings-modal.active { display: flex; }
+    .settings-sheet {
+      background: var(--card);
+      color: var(--text);
+      width: 100%;
+      max-width: 520px;
+      max-height: 88vh;
+      overflow-y: auto;
+      border-radius: 22px 22px 0 0;
+      border: 1px solid var(--line);
+      border-bottom: none;
+      padding: 20px 18px 28px;
+      box-shadow: 0 -12px 36px rgba(0,0,0,.22);
+    }
+    @media (min-width: 540px) {
+      .settings-modal { align-items: center; padding: 16px; }
+      .settings-sheet { border-radius: 20px; border-bottom: 1px solid var(--line); }
+    }
+    .sheet-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .sheet-top h2 { margin: 0; font-size: 17px; font-weight: 700; }
+    .btn-close {
+      background: var(--field);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .setting-group { margin-bottom: 16px; }
+    .setting-label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; }
+    .seg-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .seg-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .seg-btn {
+      padding: 10px 8px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--field);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all .15s;
+    }
+    .seg-btn.active {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+    .color-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .color-btn {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--field);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+    }
+    .color-btn.active {
+      border-color: var(--ink);
+      background: var(--accent-soft);
+      box-shadow: inset 0 0 0 1px var(--ink);
+    }
+    .swatch { width: 16px; height: 16px; border-radius: 50%; flex: none; border: 1px solid rgba(0,0,0,0.15); }
+
+    .support-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 12px;
+      background: var(--accent-soft);
+      border: 1px solid var(--line);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: border-color .15s;
+    }
+    .support-link:hover { border-color: var(--ink-2); }
+    .support-link small { display: block; font-size: 11px; font-weight: 400; color: var(--muted); margin-top: 2px; }
 
     @media (max-width: 380px) {
       .box.main strong { font-size: 25px; }
       .row { grid-template-columns: 1fr; gap: 0; }
     }
-    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+      .dollar-spinner { animation: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -131,46 +377,62 @@
     <div class="sticky-header">
       <div class="top">
         <div class="header">
-          <div class="mark">CB</div>
-          <div>
-            <h1>Cristian Bautista Contabilidad</h1>
-            <p>Gestión y registro de ingresos y egresos</p>
+          <div class="header-left">
+            <div class="mark">CB</div>
+            <div>
+              <h1 id="app-title">Cristian Bautista Contabilidad</h1>
+              <p id="app-subtitle">Gestión y registro de ingresos y egresos</p>
+            </div>
           </div>
+          <button type="button" class="btn-gear" id="btn-open-settings" aria-label="Configuración" onclick="abrirConfiguracion()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
         </div>
       </div>
 
       <div class="summary">
-        <div class="box main"><small>Saldo</small><strong id="balance">S/ 0.00</strong></div>
-        <div class="box in"><small>Ingresos</small><strong id="total-in" class="green">S/ 0.00</strong></div>
-        <div class="box"><small>Egresos</small><strong id="total-out" class="red">S/ 0.00</strong></div>
+        <div class="box main"><small id="lbl-balance">Saldo</small><strong id="balance">S/ 0.00</strong></div>
+        <div class="box in"><small id="lbl-incomes">Ingresos</small><strong id="total-in" class="green">S/ 0.00</strong></div>
+        <div class="box"><small id="lbl-expenses">Egresos</small><strong id="total-out" class="red">S/ 0.00</strong></div>
       </div>
     </div>
 
     <!-- PANTALLA PRINCIPAL: IR A REGISTROS + ÚLTIMOS MOVIMIENTOS + GRÁFICOS -->
     <div id="view-charts" class="view active">
       <div class="nav-wrap">
-        <button type="button" class="btn-nav" onclick="mostrarVista('registros')">Ir a registros →</button>
+        <button type="button" class="btn-nav" id="btn-go-records" onclick="mostrarVista('registros')">Ir a registros →</button>
       </div>
 
       <div class="card">
-        <h2>Últimos Movimientos</h2>
-        <p class="card-sub">Movimientos recientes sincronizados</p>
+        <div class="card-head">
+          <div>
+            <h2 id="lbl-recent">Últimos Movimientos</h2>
+            <p class="card-sub" id="lbl-recent-sub">Movimientos recientes sincronizados</p>
+          </div>
+          <button type="button" class="btn-inline-toggle" id="btn-toggle-all" onclick="alternarMostrarTodos()" style="display:none;">Mostrar todos</button>
+        </div>
         <ul id="history" class="list">
           <li class="item"><span>Sincronizando con Google Sheets...</span></li>
         </ul>
+        <div class="history-footer" id="history-footer" style="display:none;">
+          <button type="button" class="btn-inline-toggle" id="btn-toggle-all-bottom" onclick="alternarMostrarTodos()">Mostrar todos</button>
+        </div>
       </div>
 
       <div class="card">
-        <h2>Gráfico de Ingresos por Categoría</h2>
-        <p class="card-sub">Distribución acumulada de tus ingresos</p>
+        <h2 id="lbl-chart-in">Gráfico de Ingresos por Categoría</h2>
+        <p class="card-sub" id="lbl-chart-in-sub">Distribución acumulada de tus ingresos</p>
         <div id="chart-in" class="chart-list">
           <p class="empty-chart">Cargando gráfico de ingresos...</p>
         </div>
       </div>
 
       <div class="card">
-        <h2>Gráfico de Egresos por Categoría</h2>
-        <p class="card-sub">Distribución acumulada de tus egresos</p>
+        <h2 id="lbl-chart-out">Gráfico de Egresos por Categoría</h2>
+        <p class="card-sub" id="lbl-chart-out-sub">Distribución acumulada de tus egresos</p>
         <div id="chart-out" class="chart-list">
           <p class="empty-chart">Cargando gráfico de egresos...</p>
         </div>
@@ -180,7 +442,7 @@
     <!-- PANTALLA DE REGISTROS: VOLVER + FORMULARIO -->
     <div id="view-registros" class="view">
       <div class="nav-wrap">
-        <button type="button" class="btn-nav btn-secondary" onclick="mostrarVista('charts')">← Volver a gráficos</button>
+        <button type="button" class="btn-nav btn-secondary" id="btn-back-charts" onclick="mostrarVista('charts')">← Volver a gráficos</button>
       </div>
 
       <div class="card">
@@ -194,11 +456,11 @@
 
           <div class="row">
             <div class="field">
-              <label for="fecha">Fecha</label>
+              <label for="fecha" id="lbl-date">Fecha</label>
               <input type="date" id="fecha" required>
             </div>
             <div class="field">
-              <label for="monto">Monto (S/)</label>
+              <label for="monto" id="lbl-amount">Monto (S/)</label>
               <input type="number" id="monto" step="0.01" min="0.01" placeholder="0.00" required>
             </div>
           </div>
@@ -209,19 +471,19 @@
           </div>
 
           <div class="field">
-            <label for="descripcion">Concepto / Descripción</label>
+            <label for="descripcion" id="lbl-desc">Concepto / Descripción</label>
             <input type="text" id="descripcion" placeholder="Detalle del movimiento..." required>
           </div>
 
           <div class="row">
             <div class="field">
-              <label for="categoria">Categoría</label>
+              <label for="categoria" id="lbl-cat">Categoría</label>
               <select id="categoria" required>
                 <option value="">Cargando...</option>
               </select>
             </div>
             <div class="field">
-              <label for="metodoPago">Método de Pago</label>
+              <label for="metodoPago" id="lbl-method">Método de Pago</label>
               <select id="metodoPago" required>
                 <option value="">Cargando...</option>
               </select>
@@ -229,13 +491,90 @@
           </div>
 
           <div class="field">
-            <label for="observaciones">Observaciones (Opcional)</label>
+            <label for="observaciones" id="lbl-notes">Observaciones (Opcional)</label>
             <input type="text" id="observaciones" placeholder="N° de operación, factura, notas...">
           </div>
 
           <button type="submit" id="btn-save">Guardar Ingreso</button>
           <div id="status" class="status"></div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOQUEO MIENTRAS GUARDA -->
+  <div id="saving-overlay" class="saving-overlay" aria-live="assertive" aria-modal="true">
+    <div class="saving-box">
+      <div class="dollar-spinner">$</div>
+      <p class="saving-text" id="saving-message">Espere mientras se registra en el sistema</p>
+    </div>
+  </div>
+
+  <!-- PANEL DE CONFIGURACIÓN -->
+  <div id="settings-modal" class="settings-modal" onclick="cerrarSiFondo(event)">
+    <div class="settings-sheet" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="sheet-top">
+        <h2 id="settings-title">Configuración</h2>
+        <button type="button" class="btn-close" id="btn-close-settings" onclick="cerrarConfiguracion()">Cerrar</button>
+      </div>
+
+      <div class="setting-group">
+        <span class="setting-label" id="lbl-set-theme">Modo de pantalla</span>
+        <div class="seg-3">
+          <button type="button" class="seg-btn" data-theme="light" onclick="setTema('light')" id="opt-light">Claro</button>
+          <button type="button" class="seg-btn" data-theme="dark" onclick="setTema('dark')" id="opt-dark">Oscuro</button>
+          <button type="button" class="seg-btn" data-theme="auto" onclick="setTema('auto')" id="opt-auto">Automático</button>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <span class="setting-label" id="lbl-set-lang">Idioma</span>
+        <div class="seg-2">
+          <button type="button" class="seg-btn" data-lang="es" onclick="setIdioma('es')">Español</button>
+          <button type="button" class="seg-btn" data-lang="en" onclick="setIdioma('en')">English</button>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <span class="setting-label" id="lbl-set-count">Cantidad de últimos movimientos</span>
+        <div class="seg-3">
+          <button type="button" class="seg-btn" data-count="5" onclick="setCantidadMovimientos(5)">5</button>
+          <button type="button" class="seg-btn" data-count="10" onclick="setCantidadMovimientos(10)">10</button>
+          <button type="button" class="seg-btn" data-count="15" onclick="setCantidadMovimientos(15)">15</button>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <span class="setting-label" id="lbl-set-color">Color de la app</span>
+        <div class="color-grid">
+          <button type="button" class="color-btn" data-color="navy" onclick="setColorApp('navy')">
+            <span class="swatch" style="background:#0e2038;"></span>
+            <span id="col-navy">Azul Marino</span>
+          </button>
+          <button type="button" class="color-btn" data-color="emerald" onclick="setColorApp('emerald')">
+            <span class="swatch" style="background:#093b2c;"></span>
+            <span id="col-emerald">Esmeralda</span>
+          </button>
+          <button type="button" class="color-btn" data-color="burgundy" onclick="setColorApp('burgundy')">
+            <span class="swatch" style="background:#47121d;"></span>
+            <span id="col-burgundy">Borgoña</span>
+          </button>
+          <button type="button" class="color-btn" data-color="slate" onclick="setColorApp('slate')">
+            <span class="swatch" style="background:#1e293b;"></span>
+            <span id="col-slate">Pizarra</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="setting-group" style="margin-bottom:0;">
+        <span class="setting-label" id="lbl-set-support">Soporte</span>
+        <a class="support-link" href="mailto:Ferdoctus@iCloud.com?subject=Soporte%20-%20Cristian%20Bautista%20Contabilidad&body=Hola%20Fernando%20Carranza%2C%20necesito%20ayuda%20con%20la%20aplicaci%C3%B3n.">
+          <div>
+            <span id="lbl-contact-support">CONTACTAR A SOPORTE Fernando Carranza</span>
+            <small>Ferdoctus@iCloud.com</small>
+          </div>
+          <span>✉</span>
+        </a>
       </div>
     </div>
   </div>
@@ -257,200 +596,229 @@
 
     document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
 
-    function mostrarVista(vista) {
-      const chartsView = document.getElementById('view-charts');
-      const registrosView = document.getElementById('view-registros');
-      if (vista === 'registros') {
-        chartsView.classList.remove('active');
-        registrosView.classList.add('active');
-      } else {
-        registrosView.classList.remove('active');
-        chartsView.classList.add('active');
+    const I18N = {
+      es: {
+        title: 'Cristian Bautista Contabilidad',
+        subtitle: 'Gestión y registro de ingresos y egresos',
+        balance: 'Saldo',
+        incomes: 'Ingresos',
+        expenses: 'Egresos',
+        goRecords: 'Ir a registros →',
+        backCharts: '← Volver a gráficos',
+        recent: 'Últimos Movimientos',
+        recentSub: 'Movimientos recientes sincronizados',
+        showAll: 'Mostrar todos',
+        showLess: 'Ver menos',
+        chartIn: 'Gráfico de Ingresos por Categoría',
+        chartInSub: 'Distribución acumulada de tus ingresos',
+        chartOut: 'Gráfico de Egresos por Categoría',
+        chartOutSub: 'Distribución acumulada de tus egresos',
+        tabIn: '+ Ingreso',
+        tabOut: '- Egreso',
+        date: 'Fecha',
+        amount: 'Monto (S/)',
+        origin: 'Origen',
+        originPh: 'Ej. Cliente, Pago de servicio...',
+        establishment: 'Cliente / Establecimiento',
+        establishmentPh: 'Ej. Grifo, Ferretería, Proveedor...',
+        desc: 'Concepto / Descripción',
+        descPh: 'Detalle del movimiento...',
+        cat: 'Categoría',
+        method: 'Método de Pago',
+        notes: 'Observaciones (Opcional)',
+        notesPh: 'N° de operación, factura, notas...',
+        saveIn: 'Guardar Ingreso',
+        saveOut: 'Guardar Egreso',
+        savingMsg: 'Espere mientras se registra en el sistema',
+        savedOk: '¡Registro guardado!',
+        saveErr: 'Error al guardar. Verifica la URL.',
+        syncing: 'Sincronizando con Google Sheets...',
+        connErr: 'Error al conectar con Google Sheets.',
+        emptyHist: 'Aún no hay registros en las hojas.',
+        emptyIn: 'No hay ingresos registrados aún.',
+        emptyOut: 'No hay egresos registrados aún.',
+        settings: 'Configuración',
+        close: 'Cerrar',
+        setTheme: 'Modo de pantalla',
+        light: 'Claro',
+        dark: 'Oscuro',
+        auto: 'Automático',
+        setLang: 'Idioma',
+        setCount: 'Cantidad de últimos movimientos',
+        setColor: 'Color de la app',
+        navy: 'Azul Marino',
+        emerald: 'Esmeralda',
+        burgundy: 'Borgoña',
+        slate: 'Pizarra',
+        support: 'Soporte',
+        contactSupport: 'CONTACTAR A SOPORTE Fernando Carranza'
+      },
+      en: {
+        title: 'Cristian Bautista Accounting',
+        subtitle: 'Income and expense tracking & management',
+        balance: 'Balance',
+        incomes: 'Income',
+        expenses: 'Expenses',
+        goRecords: 'Go to records →',
+        backCharts: '← Back to charts',
+        recent: 'Recent Transactions',
+        recentSub: 'Recently synced transactions',
+        showAll: 'Show all',
+        showLess: 'Show less',
+        chartIn: 'Income Chart by Category',
+        chartInSub: 'Cumulative breakdown of your income',
+        chartOut: 'Expense Chart by Category',
+        chartOutSub: 'Cumulative breakdown of your expenses',
+        tabIn: '+ Income',
+        tabOut: '- Expense',
+        date: 'Date',
+        amount: 'Amount (S/)',
+        origin: 'Source',
+        originPh: 'E.g. Client, Service payment...',
+        establishment: 'Client / Merchant',
+        establishmentPh: 'E.g. Gas station, Hardware store, Supplier...',
+        desc: 'Concept / Description',
+        descPh: 'Transaction details...',
+        cat: 'Category',
+        method: 'Payment Method',
+        notes: 'Notes (Optional)',
+        notesPh: 'Operation #, invoice, notes...',
+        saveIn: 'Save Income',
+        saveOut: 'Save Expense',
+        savingMsg: 'Please wait while it is recorded in the system',
+        savedOk: 'Entry saved!',
+        saveErr: 'Error saving. Check the URL.',
+        syncing: 'Syncing with Google Sheets...',
+        connErr: 'Error connecting to Google Sheets.',
+        emptyHist: 'No records in the sheets yet.',
+        emptyIn: 'No income recorded yet.',
+        emptyOut: 'No expenses recorded yet.',
+        settings: 'Settings',
+        close: 'Close',
+        setTheme: 'Display mode',
+        light: 'Light',
+        dark: 'Dark',
+        auto: 'Auto',
+        setLang: 'Language',
+        setCount: 'Recent transactions count',
+        setColor: 'App color',
+        navy: 'Navy Blue',
+        emerald: 'Emerald',
+        burgundy: 'Burgundy',
+        slate: 'Slate',
+        support: 'Support',
+        contactSupport: 'CONTACT SUPPORT Fernando Carranza'
       }
-      window.scrollTo({ top: 0, behavior: 'instant' });
-    }
-
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxahNRdcA7N3swHzduZO9NYUq4NxtGEfN87sEolkkDrUBM70pT-3trB10TaX30pIeM0/exec';
-
-    let catalogos = {
-      metodosPago: [],
-      catIngresos: [],
-      catEgresos: []
     };
 
-    document.getElementById('fecha').valueAsDate = new Date();
-    const form = document.getElementById('tx-form');
-    const btn = document.getElementById('btn-save');
-    const statusEl = document.getElementById('status');
+    const prefs = {
+      theme: localStorage.getItem('cb_theme') || 'auto',
+      lang: localStorage.getItem('cb_lang') || 'es',
+      count: Number(localStorage.getItem('cb_count')) || 5,
+      color: localStorage.getItem('cb_color') || 'navy'
+    };
 
-    function cambiarTipo(tipo) {
-      document.getElementById('tipo').value = tipo;
-      const tabIn = document.getElementById('tab-ingreso');
-      const tabOut = document.getElementById('tab-egreso');
-      const labelEntidad = document.getElementById('label-entidad');
-      const inputEntidad = document.getElementById('entidad');
+    let mostrarTodos = false;
+    let todosMovimientos = [];
 
-      if (tipo === 'Ingreso') {
-        tabIn.className = 'tab active-in';
-        tabOut.className = 'tab';
-        labelEntidad.textContent = 'Origen';
-        inputEntidad.placeholder = 'Ej. Cliente, Pago de servicio...';
-        btn.textContent = 'Guardar Ingreso';
-        llenarSelect('categoria', catalogos.catIngresos);
-      } else {
-        tabOut.className = 'tab active-out';
-        tabIn.className = 'tab';
-        labelEntidad.textContent = 'Cliente / Establecimiento';
-        inputEntidad.placeholder = 'Ej. Grifo, Ferretería, Proveedor...';
-        btn.textContent = 'Guardar Egreso';
-        llenarSelect('categoria', catalogos.catEgresos);
-      }
-    }
+    const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-    function llenarSelect(idSelect, opciones) {
-      const select = document.getElementById(idSelect);
-      select.innerHTML = '';
-      if (!opciones || opciones.length === 0) {
-        select.innerHTML = '<option value="General">Sin datos en hoja</option>';
-        return;
-      }
-      opciones.forEach(op => {
-        const option = document.createElement('option');
-        option.value = op;
-        option.textContent = op;
-        select.appendChild(option);
+    function aplicarTema() {
+      const esOscuro = prefs.theme === 'dark' || (prefs.theme === 'auto' && darkMediaQuery.matches);
+      document.body.classList.toggle('dark', esOscuro);
+      document.body.setAttribute('data-theme-color', prefs.color);
+
+      const computedInk = getComputedStyle(document.body).getPropertyValue('--ink').trim() || '#0e2038';
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) metaTheme.setAttribute('content', computedInk);
+
+      document.querySelectorAll('[data-theme]').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-theme') === prefs.theme);
+      });
+      document.querySelectorAll('[data-color]').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-color') === prefs.color);
       });
     }
 
-    function renderGrafico(containerId, movimientos, tipo, claseColor) {
-      const container = document.getElementById(containerId);
-      const filtrados = movimientos.filter(m => m.tipo === tipo && m.monto > 0);
-
-      if (filtrados.length === 0) {
-        container.innerHTML = `<p class="empty-chart">No hay ${tipo.toLowerCase()}s registrados aún.</p>`;
-        return;
-      }
-
-      const mapa = {};
-      let totalTipo = 0;
-      filtrados.forEach(m => {
-        const cat = (m.categoria || 'Sin categoría').trim();
-        mapa[cat] = (mapa[cat] || 0) + m.monto;
-        totalTipo += m.monto;
-      });
-
-      const ordenado = Object.entries(mapa).sort((a, b) => b[1] - a[1]);
-      const maxMonto = ordenado[0][1] || 1;
-
-      container.innerHTML = ordenado.map(([cat, monto]) => {
-        const pctWidth = Math.max(2, (monto / maxMonto) * 100);
-        const pctShare = totalTipo > 0 ? ((monto / totalTipo) * 100).toFixed(1) : '0.0';
-        return `
-          <div class="chart-row">
-            <div class="chart-meta">
-              <span class="chart-label" title="${cat}">${cat}</span>
-              <span class="chart-val ${claseColor === 'in' ? 'green' : 'red'}">S/ ${monto.toFixed(2)} (${pctShare}%)</span>
-            </div>
-            <div class="track">
-              <div class="fill ${claseColor}" style="width: ${pctWidth}%"></div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function cargarDatos() {
-      try {
-        const res = await fetch(SCRIPT_URL);
-        const data = await res.json();
-        if (data.status !== 'ok') return;
-
-        catalogos = data.catalogos;
-        llenarSelect('metodoPago', catalogos.metodosPago);
-        const tipoActual = document.getElementById('tipo').value;
-        llenarSelect('categoria', tipoActual === 'Ingreso' ? catalogos.catIngresos : catalogos.catEgresos);
-
-        let ingresos = 0, egresos = 0;
-        const list = document.getElementById('history');
-        list.innerHTML = '';
-
-        data.movimientos.forEach((m, index) => {
-          if (m.tipo === 'Ingreso') ingresos += m.monto;
-          else egresos += m.monto;
-
-          if (index < 15) {
-            const li = document.createElement('li');
-            li.className = 'item';
-            const isIncome = m.tipo === 'Ingreso';
-            li.innerHTML = `
-              <div class="item-info">
-                <strong>${m.descripcion}</strong>
-                <span>${m.fecha} · ${m.entidad}</span>
-                <span class="badge">${m.categoria} · ${m.metodoPago}</span>
-              </div>
-              <strong class="${isIncome ? 'green' : 'red'}" style="white-space: nowrap;">
-                ${isIncome ? '+' : '-'} S/ ${m.monto.toFixed(2)}
-              </strong>
-            `;
-            list.appendChild(li);
-          }
-        });
-
-        if (data.movimientos.length === 0) {
-          list.innerHTML = '<li class="item"><span>Aún no hay registros en las hojas.</span></li>';
-        }
-
-        document.getElementById('total-in').textContent = `S/ ${ingresos.toFixed(2)}`;
-        document.getElementById('total-out').textContent = `S/ ${egresos.toFixed(2)}`;
-        document.getElementById('balance').textContent = `S/ ${(ingresos - egresos).toFixed(2)}`;
-
-        renderGrafico('chart-in', data.movimientos, 'Ingreso', 'in');
-        renderGrafico('chart-out', data.movimientos, 'Egreso', 'out');
-      } catch (err) {
-        document.getElementById('history').innerHTML = '<li class="item"><span>Error al conectar con Google Sheets.</span></li>';
-        document.getElementById('chart-in').innerHTML = '<p class="empty-chart">Error al cargar gráfico.</p>';
-        document.getElementById('chart-out').innerHTML = '<p class="empty-chart">Error al cargar gráfico.</p>';
-      }
-    }
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      btn.disabled = true;
-      statusEl.textContent = 'Guardando en Google Sheets...';
-
-      const payload = {
-        tipo: document.getElementById('tipo').value,
-        fecha: document.getElementById('fecha').value,
-        entidad: document.getElementById('entidad').value.trim(),
-        descripcion: document.getElementById('descripcion').value.trim(),
-        categoria: document.getElementById('categoria').value,
-        metodoPago: document.getElementById('metodoPago').value,
-        monto: document.getElementById('monto').value,
-        observaciones: document.getElementById('observaciones').value.trim()
-      };
-
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
-        });
-
-        statusEl.textContent = '¡Registro guardado!';
-        document.getElementById('monto').value = '';
-        document.getElementById('entidad').value = '';
-        document.getElementById('descripcion').value = '';
-        document.getElementById('observaciones').value = '';
-        await cargarDatos();
-      } catch (err) {
-        statusEl.textContent = 'Error al guardar. Verifica la URL.';
-      } finally {
-        btn.disabled = false;
-        setTimeout(() => statusEl.textContent = '', 3000);
-      }
+    darkMediaQuery.addEventListener('change', () => {
+      if (prefs.theme === 'auto') aplicarTema();
     });
 
-    cargarDatos();
-  </script>
-</body>
-</html>
+    function setTema(modo) {
+      prefs.theme = modo;
+      localStorage.setItem('cb_theme', modo);
+      aplicarTema();
+    }
+
+    function setColorApp(color) {
+      prefs.color = color;
+      localStorage.setItem('cb_color', color);
+      aplicarTema();
+    }
+
+    function setCantidadMovimientos(cant) {
+      prefs.count = Number(cant);
+      localStorage.setItem('cb_count', String(prefs.count));
+      mostrarTodos = false;
+      document.querySelectorAll('[data-count]').forEach(btn => {
+        btn.classList.toggle('active', Number(btn.getAttribute('data-count')) === prefs.count);
+      });
+      renderHistorial();
+    }
+
+    function aplicarIdioma() {
+      const t = I18N[prefs.lang] || I18N.es;
+      document.documentElement.lang = prefs.lang;
+
+      document.getElementById('app-title').textContent = t.title;
+      document.getElementById('app-subtitle').textContent = t.subtitle;
+      document.getElementById('lbl-balance').textContent = t.balance;
+      document.getElementById('lbl-incomes').textContent = t.incomes;
+      document.getElementById('lbl-expenses').textContent = t.expenses;
+      document.getElementById('btn-go-records').textContent = t.goRecords;
+      document.getElementById('btn-back-charts').textContent = t.backCharts;
+      document.getElementById('lbl-recent').textContent = t.recent;
+      document.getElementById('lbl-recent-sub').textContent = t.recentSub;
+      document.getElementById('lbl-chart-in').textContent = t.chartIn;
+      document.getElementById('lbl-chart-in-sub').textContent = t.chartInSub;
+      document.getElementById('lbl-chart-out').textContent = t.chartOut;
+      document.getElementById('lbl-chart-out-sub').textContent = t.chartOutSub;
+      document.getElementById('tab-ingreso').textContent = t.tabIn;
+      document.getElementById('tab-egreso').textContent = t.tabOut;
+      document.getElementById('lbl-date').textContent = t.date;
+      document.getElementById('lbl-amount').textContent = t.amount;
+      document.getElementById('lbl-desc').textContent = t.desc;
+      document.getElementById('descripcion').placeholder = t.descPh;
+      document.getElementById('lbl-cat').textContent = t.cat;
+      document.getElementById('lbl-method').textContent = t.method;
+      document.getElementById('lbl-notes').textContent = t.notes;
+      document.getElementById('observaciones').placeholder = t.notesPh;
+      document.getElementById('saving-message').textContent = t.savingMsg;
+
+      document.getElementById('settings-title').textContent = t.settings;
+      document.getElementById('btn-close-settings').textContent = t.close;
+      document.getElementById('lbl-set-theme').textContent = t.setTheme;
+      document.getElementById('opt-light').textContent = t.light;
+      document.getElementById('opt-dark').textContent = t.dark;
+      document.getElementById('opt-auto').textContent = t.auto;
+      document.getElementById('lbl-set-lang').textContent = t.setLang;
+      document.getElementById('lbl-set-count').textContent = t.setCount;
+      document.getElementById('lbl-set-color').textContent = t.setColor;
+      document.getElementById('col-navy').textContent = t.navy;
+      document.getElementById('col-emerald').textContent = t.emerald;
+      document.getElementById('col-burgundy').textContent = t.burgundy;
+      document.getElementById('col-slate').textContent = t.slate;
+      document.getElementById('lbl-set-support').textContent = t.support;
+      document.getElementById('lbl-contact-support').textContent = t.contactSupport;
+
+      document.querySelectorAll('[data-lang]').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-lang') === prefs.lang);
+      });
+
+      const tipoActual = document.getElementById('tipo').value;
+      actualizarTextosTipo(tipoActual);
+      actualizarBotonesToggle();
+    }
+
+    function setIdioma(idioma) {
+      prefs.lang =
