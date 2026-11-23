@@ -120,11 +120,33 @@
     .box { padding: 12px 16px; text-align: left; min-width: 0; }
     .box small { color: var(--muted); font-size: 12px; display: block; font-weight: 500; }
     .box strong { font-size: 18px; margin-top: 3px; display: block; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -0.2px; }
-    .box.main { grid-column: 1 / -1; background: var(--accent-soft); border-bottom: 1px solid var(--line); padding: 14px 16px; }
+    .box.main { grid-column: 1 / -1; background: var(--accent-soft); border-bottom: 1px solid var(--line); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .box.main strong { font-size: 28px; font-weight: 700; color: var(--text); letter-spacing: -0.6px; }
     .box.in { border-right: 1px solid var(--line); }
     .green { color: var(--green); }
     .red { color: var(--red); }
+
+    /* Botón integrado Data completa */
+    .btn-sheet-link {
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--line);
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,.06);
+      transition: background .15s, border-color .15s, transform .1s;
+    }
+    .btn-sheet-link:hover { border-color: var(--ink-2); background: var(--field); }
+    .btn-sheet-link:active { transform: scale(.97); }
+    .btn-sheet-link svg { color: var(--green); flex: none; }
 
     /* Botones navegación */
     .nav-wrap { margin: 4px 14px 14px; }
@@ -169,15 +191,17 @@
     .fill.out { background: var(--red); }
     .empty-chart { color: var(--muted); font-size: 13px; padding: 8px 0; margin: 0; }
 
-    /* Selector Ingreso / Egreso */
+    /* Selector Egreso / Ingreso */
     .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 18px; background: var(--field); border: 1px solid var(--line); padding: 4px; border-radius: 12px; }
     .tab { padding: 10px; border: 1px solid transparent; border-radius: 9px; background: transparent; font-weight: 600; cursor: pointer; text-align: center; font-size: 14px; color: var(--muted); transition: background .15s, color .15s, box-shadow .15s; user-select: none; }
     .tab.active-in { background: var(--green); color: #fff; box-shadow: 0 2px 8px rgba(13,122,78,.3); }
     .tab.active-out { background: var(--red); color: #fff; box-shadow: 0 2px 8px rgba(179,50,31,.3); }
 
-    /* Formulario */
+    /* Formulario con color de etiquetas según modo activo */
     .field { margin-bottom: 14px; min-width: 0; }
-    label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted); }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--muted); transition: color .15s; }
+    #tx-form.mode-out label { color: var(--red); }
+    #tx-form.mode-in label { color: var(--green); }
     input, select { width: 100%; max-width: 100%; min-width: 0; padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 15px; background: var(--field); color: var(--text); transition: border-color .15s, box-shadow .15s, background .15s; }
     input[type="date"] { -webkit-appearance: none; appearance: none; min-height: 44px; line-height: 1.2; }
     input::placeholder { color: var(--placeholder); }
@@ -458,7 +482,21 @@
       </div>
 
       <div class="summary">
-        <div class="box main"><small id="lbl-balance">Saldo</small><strong id="balance">S/ 0.00</strong></div>
+        <div class="box main">
+          <div>
+            <small id="lbl-balance">Saldo</small>
+            <strong id="balance">S/ 0.00</strong>
+          </div>
+          <a class="btn-sheet-link" id="btn-full-data" href="https://docs.google.com/spreadsheets/d/1hNY2fsdnp4_NcrhboaKMkZdw9BDzxG4E4lkv6pp6dOE/edit?gid=1597396118#gid=1597396118" target="_blank" rel="noopener noreferrer">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="3" y1="15" x2="21" y2="15"></line>
+              <line x1="9" y1="9" x2="9" y2="21"></line>
+            </svg>
+            <span id="lbl-full-data">Data completa</span>
+          </a>
+        </div>
         <div class="box in"><small id="lbl-incomes">Ingresos</small><strong id="total-in" class="green">S/ 0.00</strong></div>
         <div class="box"><small id="lbl-expenses">Egresos</small><strong id="total-out" class="red">S/ 0.00</strong></div>
       </div>
@@ -511,12 +549,12 @@
 
       <div class="card">
         <div class="tabs">
-          <div id="tab-ingreso" class="tab active-in" onclick="cambiarTipo('Ingreso')">+ Ingreso</div>
-          <div id="tab-egreso" class="tab" onclick="cambiarTipo('Egreso')">- Egreso</div>
+          <div id="tab-egreso" class="tab active-out" onclick="cambiarTipo('Egreso')">- Egreso</div>
+          <div id="tab-ingreso" class="tab" onclick="cambiarTipo('Ingreso')">+ Ingreso</div>
         </div>
 
-        <form id="tx-form">
-          <input type="hidden" id="tipo" value="Ingreso">
+        <form id="tx-form" class="mode-out">
+          <input type="hidden" id="tipo" value="Egreso">
 
           <div class="row">
             <div class="field">
@@ -530,25 +568,25 @@
           </div>
 
           <div class="field">
-            <label id="label-entidad" for="entidad">Origen</label>
-            <input type="text" id="entidad" placeholder="Ej. Cliente, Pago de servicio..." required>
+            <label id="label-entidad" for="entidad">Cliente / Establecimiento</label>
+            <input type="text" id="entidad" placeholder="Ej. Grifo, Ferretería, Proveedor...">
           </div>
 
           <div class="field">
             <label for="descripcion" id="lbl-desc">Concepto / Descripción</label>
-            <input type="text" id="descripcion" placeholder="Detalle del movimiento..." required>
+            <input type="text" id="descripcion" placeholder="Detalle del movimiento...">
           </div>
 
           <div class="row">
             <div class="field">
               <label for="categoria" id="lbl-cat">Categoría</label>
-              <select id="categoria" required>
+              <select id="categoria">
                 <option value="">Cargando...</option>
               </select>
             </div>
             <div class="field">
               <label for="metodoPago" id="lbl-method">Método de Pago</label>
-              <select id="metodoPago" required>
+              <select id="metodoPago">
                 <option value="">Cargando...</option>
               </select>
             </div>
@@ -559,7 +597,7 @@
             <input type="text" id="observaciones" placeholder="N° de operación, factura, notas...">
           </div>
 
-          <button type="submit" id="btn-save">Guardar Ingreso</button>
+          <button type="submit" id="btn-save">Guardar Egreso</button>
           <div id="status" class="status"></div>
         </form>
       </div>
@@ -682,6 +720,7 @@
         title: 'Cristian Bautista Contabilidad',
         subtitle: 'Gestión y registro de ingresos y egresos',
         balance: 'Saldo',
+        fullData: 'Data completa',
         incomes: 'Ingresos',
         expenses: 'Egresos',
         goRecords: 'Ir a registros →',
@@ -743,6 +782,7 @@
         title: 'Cristian Bautista Accounting',
         subtitle: 'Income and expense tracking & management',
         balance: 'Balance',
+        fullData: 'Full data',
         incomes: 'Income',
         expenses: 'Expenses',
         goRecords: 'Go to records →',
@@ -866,6 +906,7 @@
       document.getElementById('app-title').textContent = t.title;
       document.getElementById('app-subtitle').textContent = t.subtitle;
       document.getElementById('lbl-balance').textContent = t.balance;
+      document.getElementById('lbl-full-data').textContent = t.fullData;
       document.getElementById('lbl-incomes').textContent = t.incomes;
       document.getElementById('lbl-expenses').textContent = t.expenses;
       document.getElementById('btn-go-records').textContent = t.goRecords;
@@ -953,14 +994,24 @@
       const entidadLabel = payload.tipo === 'Ingreso' ? t.origin : t.establishment;
       const montoFmt = `S/ ${Number(payload.monto || 0).toFixed(2)}`;
 
-      document.getElementById('confirm-summary').innerHTML = `
+      let html = `
         <div class="confirm-line"><span>${t.confirmType}:</span><strong>${payload.tipo}</strong></div>
         <div class="confirm-line"><span>${t.amount}:</span><strong>${montoFmt}</strong></div>
-        <div class="confirm-line"><span>${entidadLabel}:</span><strong>${payload.entidad}</strong></div>
-        <div class="confirm-line"><span>${t.desc}:</span><strong>${payload.descripcion}</strong></div>
-        <div class="confirm-line"><span>${t.cat}:</span><strong>${payload.categoria}</strong></div>
-        <div class="confirm-line"><span>${t.method}:</span><strong>${payload.metodoPago}</strong></div>
       `;
+      if (payload.entidad) {
+        html += `<div class="confirm-line"><span>${entidadLabel}:</span><strong>${payload.entidad}</strong></div>`;
+      }
+      if (payload.descripcion) {
+        html += `<div class="confirm-line"><span>${t.desc}:</span><strong>${payload.descripcion}</strong></div>`;
+      }
+      if (payload.categoria) {
+        html += `<div class="confirm-line"><span>${t.cat}:</span><strong>${payload.categoria}</strong></div>`;
+      }
+      if (payload.metodoPago) {
+        html += `<div class="confirm-line"><span>${t.method}:</span><strong>${payload.metodoPago}</strong></div>`;
+      }
+
+      document.getElementById('confirm-summary').innerHTML = html;
       document.getElementById('confirm-modal').classList.add('active');
     }
 
@@ -1005,12 +1056,16 @@
       if (tipo === 'Ingreso') {
         tabIn.className = 'tab active-in';
         tabOut.className = 'tab';
+        form.classList.remove('mode-out');
+        form.classList.add('mode-in');
         labelEntidad.textContent = t.origin;
         inputEntidad.placeholder = t.originPh;
         btn.textContent = t.saveIn;
       } else {
         tabOut.className = 'tab active-out';
         tabIn.className = 'tab';
+        form.classList.remove('mode-in');
+        form.classList.add('mode-out');
         labelEntidad.textContent = t.establishment;
         inputEntidad.placeholder = t.establishmentPh;
         btn.textContent = t.saveOut;
@@ -1070,9 +1125,9 @@
         const isIncome = m.tipo === 'Ingreso';
         li.innerHTML = `
           <div class="item-info">
-            <strong>${m.descripcion}</strong>
-            <span>${m.fecha} · ${m.entidad}</span>
-            <span class="badge">${m.categoria} · ${m.metodoPago}</span>
+            <strong>${m.descripcion || m.categoria || m.tipo}</strong>
+            <span>${m.fecha}${m.entidad ? ' · ' + m.entidad : ''}</span>
+            <span class="badge">${m.categoria || 'General'}${m.metodoPago ? ' · ' + m.metodoPago : ''}</span>
           </div>
           <strong class="${isIncome ? 'green' : 'red'}" style="white-space: nowrap;">
             ${isIncome ? '+' : '-'} S/ ${Number(m.monto || 0).toFixed(2)}
@@ -1186,8 +1241,8 @@
         fecha: document.getElementById('fecha').value,
         entidad: document.getElementById('entidad').value.trim(),
         descripcion: document.getElementById('descripcion').value.trim(),
-        categoria: document.getElementById('categoria').value,
-        metodoPago: document.getElementById('metodoPago').value,
+        categoria: document.getElementById('categoria').value || 'General',
+        metodoPago: document.getElementById('metodoPago').value || '',
         monto: document.getElementById('monto').value,
         observaciones: document.getElementById('observaciones').value.trim()
       };
