@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
   <title>Cristian Bautista Contabilidad</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +24,8 @@
       --brass: #c19a4d;
       --radius: 14px;
     }
-    * { box-sizing: border-box; font-family: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; }
+    * { box-sizing: border-box; font-family: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; touch-action: manipulation; }
+    html, body { touch-action: pan-x pan-y; overscroll-behavior-x: none; }
     body { background: var(--bg); color: var(--text); margin: 0; padding: 0 0 32px; display: flex; justify-content: center; -webkit-font-smoothing: antialiased; }
     .container { width: 100%; max-width: 520px; }
 
@@ -45,9 +46,34 @@
     .green { color: var(--green); }
     .red { color: var(--red); }
 
+    /* Botón navegación entre vistas */
+    .nav-wrap { margin: 0 14px 14px; }
+    button.btn-nav { width: 100%; padding: 13px 16px; background: var(--ink); color: #fff; border: none; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(14,32,56,.14); transition: background .15s, transform .1s; }
+    button.btn-nav:hover { background: var(--ink-2); }
+    button.btn-nav:active { transform: scale(.985); }
+    button.btn-secondary { background: var(--card); color: var(--ink); border: 1px solid var(--line); box-shadow: none; }
+    button.btn-secondary:hover { background: var(--field); }
+
+    /* Vistas */
+    .view { display: none; }
+    .view.active { display: block; }
+
     /* Tarjetas */
     .card { background: var(--card); padding: 18px 16px; border-radius: var(--radius); border: 1px solid var(--line); margin: 0 14px 14px; }
     .card h2 { margin: 0 0 6px !important; font-size: 16px !important; font-weight: 600; color: var(--ink); }
+    .card-sub { margin: 0 0 14px; font-size: 12px; color: var(--muted); }
+
+    /* Gráficos de barras */
+    .chart-list { display: flex; flex-direction: column; gap: 12px; }
+    .chart-row { display: flex; flex-direction: column; gap: 5px; }
+    .chart-meta { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; gap: 8px; }
+    .chart-label { font-weight: 500; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .chart-val { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .track { width: 100%; height: 10px; background: var(--field); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+    .fill { height: 100%; border-radius: 999px; min-width: 4px; transition: width .35s ease; }
+    .fill.in { background: var(--green); }
+    .fill.out { background: var(--red); }
+    .empty-chart { color: var(--muted); font-size: 13px; padding: 8px 0; margin: 0; }
 
     /* Selector Ingreso / Egreso */
     .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 18px; background: var(--field); border: 1px solid var(--line); padding: 4px; border-radius: 12px; }
@@ -109,70 +135,129 @@
       <div class="box"><small>Egresos</small><strong id="total-out" class="red">S/ 0.00</strong></div>
     </div>
 
-    <div class="card">
-      <div class="tabs">
-        <div id="tab-ingreso" class="tab active-in" onclick="cambiarTipo('Ingreso')">+ Ingreso</div>
-        <div id="tab-egreso" class="tab" onclick="cambiarTipo('Egreso')">- Egreso</div>
+    <!-- PANTALLA PRINCIPAL: GRÁFICOS + IR A REGISTROS -->
+    <div id="view-charts" class="view active">
+      <div class="nav-wrap">
+        <button type="button" class="btn-nav" onclick="mostrarVista('registros')">Ir a registros →</button>
       </div>
 
-      <form id="tx-form">
-        <input type="hidden" id="tipo" value="Ingreso">
-
-        <div class="row">
-          <div class="field">
-            <label>Fecha</label>
-            <input type="date" id="fecha" required>
-          </div>
-          <div class="field">
-            <label>Monto (S/)</label>
-            <input type="number" id="monto" step="0.01" min="0.01" placeholder="0.00" required>
-          </div>
+      <div class="card">
+        <h2>Gráfico de Ingresos por Categoría</h2>
+        <p class="card-sub">Distribución acumulada de tus ingresos</p>
+        <div id="chart-in" class="chart-list">
+          <p class="empty-chart">Cargando gráfico de ingresos...</p>
         </div>
+      </div>
 
-        <div class="field">
-          <label id="label-entidad">Origen</label>
-          <input type="text" id="entidad" placeholder="Ej. Cliente, Pago de servicio..." required>
+      <div class="card">
+        <h2>Gráfico de Egresos por Categoría</h2>
+        <p class="card-sub">Distribución acumulada de tus egresos</p>
+        <div id="chart-out" class="chart-list">
+          <p class="empty-chart">Cargando gráfico de egresos...</p>
         </div>
-
-        <div class="field">
-          <label>Concepto / Descripción</label>
-          <input type="text" id="descripcion" placeholder="Detalle del movimiento..." required>
-        </div>
-
-        <div class="row">
-          <div class="field">
-            <label>Categoría</label>
-            <select id="categoria" required>
-              <option value="">Cargando...</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Método de Pago</label>
-            <select id="metodoPago" required>
-              <option value="">Cargando...</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="field">
-          <label>Observaciones (Opcional)</label>
-          <input type="text" id="observaciones" placeholder="N° de operación, factura, notas...">
-        </div>
-
-        <button type="submit" id="btn-save">Guardar Ingreso</button>
-        <div id="status" class="status"></div>
-      </form>
+      </div>
     </div>
 
-    <div class="card">
-      <h2 style="margin: 0 0 10px; font-size: 16px;">Últimos Movimientos</h2>
-      <ul id="history" class="list">
-        <li class="item"><span>Sincronizando con Google Sheets...</span></li>
-      </ul>
+    <!-- PANTALLA DE REGISTROS: FORMULARIO + HISTORIAL -->
+    <div id="view-registros" class="view">
+      <div class="nav-wrap">
+        <button type="button" class="btn-nav btn-secondary" onclick="mostrarVista('charts')">← Volver a gráficos</button>
+      </div>
+
+      <div class="card">
+        <div class="tabs">
+          <div id="tab-ingreso" class="tab active-in" onclick="cambiarTipo('Ingreso')">+ Ingreso</div>
+          <div id="tab-egreso" class="tab" onclick="cambiarTipo('Egreso')">- Egreso</div>
+        </div>
+
+        <form id="tx-form">
+          <input type="hidden" id="tipo" value="Ingreso">
+
+          <div class="row">
+            <div class="field">
+              <label>Fecha</label>
+              <input type="date" id="fecha" required>
+            </div>
+            <div class="field">
+              <label>Monto (S/)</label>
+              <input type="number" id="monto" step="0.01" min="0.01" placeholder="0.00" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label id="label-entidad">Origen</label>
+            <input type="text" id="entidad" placeholder="Ej. Cliente, Pago de servicio..." required>
+          </div>
+
+          <div class="field">
+            <label>Concepto / Descripción</label>
+            <input type="text" id="descripcion" placeholder="Detalle del movimiento..." required>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Categoría</label>
+              <select id="categoria" required>
+                <option value="">Cargando...</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Método de Pago</label>
+              <select id="metodoPago" required>
+                <option value="">Cargando...</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Observaciones (Opcional)</label>
+            <input type="text" id="observaciones" placeholder="N° de operación, factura, notas...">
+          </div>
+
+          <button type="submit" id="btn-save">Guardar Ingreso</button>
+          <div id="status" class="status"></div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2 style="margin: 0 0 10px; font-size: 16px;">Últimos Movimientos</h2>
+        <ul id="history" class="list">
+          <li class="item"><span>Sincronizando con Google Sheets...</span></li>
+        </ul>
+      </div>
     </div>
   </div>
 
   <script>
+    // Bloquear zoom por pellizco (gestos) y doble toque
+    document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
+    document.addEventListener('gesturechange', (e) => e.preventDefault(), { passive: false });
+    document.addEventListener('gestureend', (e) => e.preventDefault(), { passive: false });
+
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (e) => {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, { passive: false });
+
+    document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
+
+    function mostrarVista(vista) {
+      const chartsView = document.getElementById('view-charts');
+      const registrosView = document.getElementById('view-registros');
+      if (vista === 'registros') {
+        chartsView.classList.remove('active');
+        registrosView.classList.add('active');
+      } else {
+        registrosView.classList.remove('active');
+        chartsView.classList.add('active');
+      }
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxahNRdcA7N3swHzduZO9NYUq4NxtGEfN87sEolkkDrUBM70pT-3trB10TaX30pIeM0/exec';
 
     let catalogos = {
@@ -225,6 +310,43 @@
       });
     }
 
+    function renderGrafico(containerId, movimientos, tipo, claseColor) {
+      const container = document.getElementById(containerId);
+      const filtrados = movimientos.filter(m => m.tipo === tipo && m.monto > 0);
+
+      if (filtrados.length === 0) {
+        container.innerHTML = `<p class="empty-chart">No hay ${tipo.toLowerCase()}s registrados aún.</p>`;
+        return;
+      }
+
+      const mapa = {};
+      let totalTipo = 0;
+      filtrados.forEach(m => {
+        const cat = (m.categoria || 'Sin categoría').trim();
+        mapa[cat] = (mapa[cat] || 0) + m.monto;
+        totalTipo += m.monto;
+      });
+
+      const ordenado = Object.entries(mapa).sort((a, b) => b[1] - a[1]);
+      const maxMonto = ordenado[0][1] || 1;
+
+      container.innerHTML = ordenado.map(([cat, monto]) => {
+        const pctWidth = Math.max(2, (monto / maxMonto) * 100);
+        const pctShare = totalTipo > 0 ? ((monto / totalTipo) * 100).toFixed(1) : '0.0';
+        return `
+          <div class="chart-row">
+            <div class="chart-meta">
+              <span class="chart-label" title="${cat}">${cat}</span>
+              <span class="chart-val ${claseColor === 'in' ? 'green' : 'red'}">S/ ${monto.toFixed(2)} (${pctShare}%)</span>
+            </div>
+            <div class="track">
+              <div class="fill ${claseColor}" style="width: ${pctWidth}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
     async function cargarDatos() {
       try {
         const res = await fetch(SCRIPT_URL);
@@ -269,8 +391,13 @@
         document.getElementById('total-in').textContent = `S/ ${ingresos.toFixed(2)}`;
         document.getElementById('total-out').textContent = `S/ ${egresos.toFixed(2)}`;
         document.getElementById('balance').textContent = `S/ ${(ingresos - egresos).toFixed(2)}`;
+
+        renderGrafico('chart-in', data.movimientos, 'Ingreso', 'in');
+        renderGrafico('chart-out', data.movimientos, 'Egreso', 'out');
       } catch (err) {
         document.getElementById('history').innerHTML = '<li class="item"><span>Error al conectar con Google Sheets.</span></li>';
+        document.getElementById('chart-in').innerHTML = '<p class="empty-chart">Error al cargar gráfico.</p>';
+        document.getElementById('chart-out').innerHTML = '<p class="empty-chart">Error al cargar gráfico.</p>';
       }
     }
 
