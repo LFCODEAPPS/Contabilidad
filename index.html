@@ -29,25 +29,32 @@
     body { background: var(--bg); color: var(--text); margin: 0; padding: 0 0 32px; display: flex; justify-content: center; -webkit-font-smoothing: antialiased; }
     .container { width: 100%; max-width: 520px; }
 
-    /* Encabezado + resumen */
-    .top { background: linear-gradient(180deg, var(--ink) 0%, var(--ink-2) 100%); color: #fff; padding: 22px 18px 54px; border-radius: 0 0 26px 26px; }
+    /* Cabecera fija al scroll (encabezado + resumen) */
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--bg);
+      padding-bottom: 6px;
+    }
+    .top { background: linear-gradient(180deg, var(--ink) 0%, var(--ink-2) 100%); color: #fff; padding: 18px 18px 48px; border-radius: 0 0 24px 24px; }
     .header { display: flex; align-items: center; gap: 12px; }
     .mark { flex: none; width: 40px; height: 40px; border-radius: 10px; border: 1.5px solid var(--brass); color: var(--brass); display: grid; place-items: center; font-weight: 700; font-size: 15px; letter-spacing: 0.5px; }
     .header h1 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: 0.1px; line-height: 1.2; }
     .header p { margin: 3px 0 0; font-size: 12px; color: #aebbd0; font-weight: 400; }
 
-    .summary { margin: -38px 14px 14px; background: var(--card); border-radius: var(--radius); box-shadow: 0 10px 30px rgba(14,32,56,.14); overflow: hidden; display: grid; grid-template-columns: 1fr 1fr; }
-    .box { padding: 14px 16px; text-align: left; }
+    .summary { margin: -36px 14px 8px; background: var(--card); border-radius: var(--radius); box-shadow: 0 10px 26px rgba(14,32,56,.14); overflow: hidden; display: grid; grid-template-columns: 1fr 1fr; }
+    .box { padding: 12px 16px; text-align: left; min-width: 0; }
     .box small { color: var(--muted); font-size: 12px; display: block; font-weight: 500; }
-    .box strong { font-size: 18px; margin-top: 4px; display: block; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -0.2px; }
-    .box.main { grid-column: 1 / -1; background: #f3f6fa; border-bottom: 1px solid var(--line); padding: 16px; }
-    .box.main strong { font-size: 30px; font-weight: 700; color: var(--ink); letter-spacing: -0.6px; }
+    .box strong { font-size: 18px; margin-top: 3px; display: block; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -0.2px; }
+    .box.main { grid-column: 1 / -1; background: #f3f6fa; border-bottom: 1px solid var(--line); padding: 14px 16px; }
+    .box.main strong { font-size: 28px; font-weight: 700; color: var(--ink); letter-spacing: -0.6px; }
     .box.in { border-right: 1px solid var(--line); }
     .green { color: var(--green); }
     .red { color: var(--red); }
 
     /* Botón navegación entre vistas */
-    .nav-wrap { margin: 0 14px 14px; }
+    .nav-wrap { margin: 4px 14px 14px; }
     button.btn-nav { width: 100%; padding: 13px 16px; background: var(--ink); color: #fff; border: none; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(14,32,56,.14); transition: background .15s, transform .1s; }
     button.btn-nav:hover { background: var(--ink-2); }
     button.btn-nav:active { transform: scale(.985); }
@@ -82,14 +89,15 @@
     .tab.active-out { background: var(--red); color: #fff; box-shadow: 0 2px 8px rgba(179,50,31,.3); }
 
     /* Formulario */
-    .field { margin-bottom: 14px; }
+    .field { margin-bottom: 14px; min-width: 0; }
     label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted); }
-    input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 15px; background: var(--field); color: var(--text); transition: border-color .15s, box-shadow .15s, background .15s; }
+    input, select { width: 100%; max-width: 100%; min-width: 0; padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 15px; background: var(--field); color: var(--text); transition: border-color .15s, box-shadow .15s, background .15s; }
+    input[type="date"] { -webkit-appearance: none; appearance: none; min-height: 44px; line-height: 1.2; }
     input::placeholder { color: #98a5b7; }
     input:focus, select:focus { outline: none; border-color: var(--ink-2); background: #fff; box-shadow: 0 0 0 3px rgba(22,49,90,.14); }
     select { appearance: none; -webkit-appearance: none; padding-right: 34px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%235f6f84' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
     #monto { font-weight: 600; font-variant-numeric: tabular-nums; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
 
     button#btn-save { width: 100%; padding: 14px; background: var(--ink); color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 4px; transition: background .15s, transform .1s; }
     button#btn-save:hover { background: var(--ink-2); }
@@ -111,7 +119,7 @@
     .item-info span.badge, .badge { display: inline-block; background: #eaeff6; color: #3b4d66; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 999px; margin-top: 6px; }
 
     @media (max-width: 380px) {
-      .box.main strong { font-size: 26px; }
+      .box.main strong { font-size: 25px; }
       .row { grid-template-columns: 1fr; gap: 0; }
     }
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
@@ -119,26 +127,37 @@
 </head>
 <body>
   <div class="container">
-    <div class="top">
-      <div class="header">
-        <div class="mark">CB</div>
-        <div>
-          <h1>Cristian Bautista Contabilidad</h1>
-          <p>Gestión y registro de ingresos y egresos</p>
+    <!-- CABECERA FIJA -->
+    <div class="sticky-header">
+      <div class="top">
+        <div class="header">
+          <div class="mark">CB</div>
+          <div>
+            <h1>Cristian Bautista Contabilidad</h1>
+            <p>Gestión y registro de ingresos y egresos</p>
+          </div>
         </div>
+      </div>
+
+      <div class="summary">
+        <div class="box main"><small>Saldo</small><strong id="balance">S/ 0.00</strong></div>
+        <div class="box in"><small>Ingresos</small><strong id="total-in" class="green">S/ 0.00</strong></div>
+        <div class="box"><small>Egresos</small><strong id="total-out" class="red">S/ 0.00</strong></div>
       </div>
     </div>
 
-    <div class="summary">
-      <div class="box main"><small>Saldo</small><strong id="balance">S/ 0.00</strong></div>
-      <div class="box in"><small>Ingresos</small><strong id="total-in" class="green">S/ 0.00</strong></div>
-      <div class="box"><small>Egresos</small><strong id="total-out" class="red">S/ 0.00</strong></div>
-    </div>
-
-    <!-- PANTALLA PRINCIPAL: GRÁFICOS + IR A REGISTROS -->
+    <!-- PANTALLA PRINCIPAL: IR A REGISTROS + ÚLTIMOS MOVIMIENTOS + GRÁFICOS -->
     <div id="view-charts" class="view active">
       <div class="nav-wrap">
         <button type="button" class="btn-nav" onclick="mostrarVista('registros')">Ir a registros →</button>
+      </div>
+
+      <div class="card">
+        <h2>Últimos Movimientos</h2>
+        <p class="card-sub">Movimientos recientes sincronizados</p>
+        <ul id="history" class="list">
+          <li class="item"><span>Sincronizando con Google Sheets...</span></li>
+        </ul>
       </div>
 
       <div class="card">
@@ -158,7 +177,7 @@
       </div>
     </div>
 
-    <!-- PANTALLA DE REGISTROS: FORMULARIO + HISTORIAL -->
+    <!-- PANTALLA DE REGISTROS: VOLVER + FORMULARIO -->
     <div id="view-registros" class="view">
       <div class="nav-wrap">
         <button type="button" class="btn-nav btn-secondary" onclick="mostrarVista('charts')">← Volver a gráficos</button>
@@ -175,34 +194,34 @@
 
           <div class="row">
             <div class="field">
-              <label>Fecha</label>
+              <label for="fecha">Fecha</label>
               <input type="date" id="fecha" required>
             </div>
             <div class="field">
-              <label>Monto (S/)</label>
+              <label for="monto">Monto (S/)</label>
               <input type="number" id="monto" step="0.01" min="0.01" placeholder="0.00" required>
             </div>
           </div>
 
           <div class="field">
-            <label id="label-entidad">Origen</label>
+            <label id="label-entidad" for="entidad">Origen</label>
             <input type="text" id="entidad" placeholder="Ej. Cliente, Pago de servicio..." required>
           </div>
 
           <div class="field">
-            <label>Concepto / Descripción</label>
+            <label for="descripcion">Concepto / Descripción</label>
             <input type="text" id="descripcion" placeholder="Detalle del movimiento..." required>
           </div>
 
           <div class="row">
             <div class="field">
-              <label>Categoría</label>
+              <label for="categoria">Categoría</label>
               <select id="categoria" required>
                 <option value="">Cargando...</option>
               </select>
             </div>
             <div class="field">
-              <label>Método de Pago</label>
+              <label for="metodoPago">Método de Pago</label>
               <select id="metodoPago" required>
                 <option value="">Cargando...</option>
               </select>
@@ -210,20 +229,13 @@
           </div>
 
           <div class="field">
-            <label>Observaciones (Opcional)</label>
+            <label for="observaciones">Observaciones (Opcional)</label>
             <input type="text" id="observaciones" placeholder="N° de operación, factura, notas...">
           </div>
 
           <button type="submit" id="btn-save">Guardar Ingreso</button>
           <div id="status" class="status"></div>
         </form>
-      </div>
-
-      <div class="card">
-        <h2 style="margin: 0 0 10px; font-size: 16px;">Últimos Movimientos</h2>
-        <ul id="history" class="list">
-          <li class="item"><span>Sincronizando con Google Sheets...</span></li>
-        </ul>
       </div>
     </div>
   </div>
@@ -366,7 +378,7 @@
           if (m.tipo === 'Ingreso') ingresos += m.monto;
           else egresos += m.monto;
 
-          if (index < 20) {
+          if (index < 15) {
             const li = document.createElement('li');
             li.className = 'item';
             const isIncome = m.tipo === 'Ingreso';
