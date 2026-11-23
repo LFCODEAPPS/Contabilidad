@@ -258,6 +258,69 @@
       line-height: 1.4;
     }
 
+    /* Cuadro de confirmación antes de guardar */
+    .confirm-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      background: rgba(11, 18, 29, 0.65);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .confirm-modal.active { display: flex; }
+    .confirm-box {
+      background: var(--card);
+      color: var(--text);
+      width: 100%;
+      max-width: 380px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      padding: 20px 18px;
+      box-shadow: 0 18px 42px rgba(0,0,0,.28);
+    }
+    .confirm-box h3 { margin: 0 0 6px; font-size: 17px; font-weight: 700; }
+    .confirm-desc { margin: 0 0 14px; font-size: 13px; color: var(--muted); }
+    .confirm-summary {
+      background: var(--field);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .confirm-line { display: flex; justify-content: space-between; gap: 10px; }
+    .confirm-line span { color: var(--muted); }
+    .confirm-line strong { color: var(--text); text-align: right; word-break: break-word; }
+    .confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .btn-cancel-confirm {
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--field);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-accept-confirm {
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: var(--ink);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-accept-confirm:hover { background: var(--ink-2); }
+
     /* Modal de Configuración */
     .settings-modal {
       position: fixed;
@@ -359,6 +422,7 @@
       transition: border-color .15s;
     }
     .support-link:hover { border-color: var(--ink-2); }
+    .support-link .support-name { display: block; font-size: 12px; font-weight: 500; color: var(--text); margin-top: 2px; }
     .support-link small { display: block; font-size: 11px; font-weight: 400; color: var(--muted); margin-top: 2px; }
 
     @media (max-width: 380px) {
@@ -502,6 +566,19 @@
     </div>
   </div>
 
+  <!-- DIÁLOGO DE CONFIRMACIÓN ANTES DE GUARDAR -->
+  <div id="confirm-modal" class="confirm-modal" onclick="cerrarConfirmacionSiFondo(event)">
+    <div class="confirm-box" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <h3 id="confirm-title">Confirmar registro</h3>
+      <p class="confirm-desc" id="confirm-desc">¿Deseas guardar este movimiento en Google Sheets?</p>
+      <div class="confirm-summary" id="confirm-summary"></div>
+      <div class="confirm-actions">
+        <button type="button" class="btn-cancel-confirm" id="btn-cancel-confirm" onclick="cancelarGuardado()">Cancelar</button>
+        <button type="button" class="btn-accept-confirm" id="btn-accept-confirm" onclick="ejecutarGuardadoConfirmado()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- BLOQUEO MIENTRAS GUARDA -->
   <div id="saving-overlay" class="saving-overlay" aria-live="assertive" aria-modal="true">
     <div class="saving-box">
@@ -570,7 +647,8 @@
         <span class="setting-label" id="lbl-set-support">Soporte</span>
         <a class="support-link" href="mailto:Ferdoctus@iCloud.com?subject=Soporte%20-%20Cristian%20Bautista%20Contabilidad&body=Hola%20Fernando%20Carranza%2C%20necesito%20ayuda%20con%20la%20aplicaci%C3%B3n.">
           <div>
-            <span id="lbl-contact-support">CONTACTAR A SOPORTE Fernando Carranza</span>
+            <span id="lbl-contact-support">CONTACTAR A SOPORTE</span>
+            <span class="support-name">Fernando Carranza</span>
             <small>Ferdoctus@iCloud.com</small>
           </div>
           <span>✉</span>
@@ -632,6 +710,11 @@
         notesPh: 'N° de operación, factura, notas...',
         saveIn: 'Guardar Ingreso',
         saveOut: 'Guardar Egreso',
+        confirmTitle: 'Confirmar registro',
+        confirmDesc: '¿Deseas guardar este movimiento en Google Sheets?',
+        confirmType: 'Tipo',
+        confirmCancel: 'Cancelar',
+        confirmAccept: 'Confirmar',
         savingMsg: 'Espere mientras se registra en el sistema',
         savedOk: '¡Registro guardado!',
         saveErr: 'Error al guardar. Verifica la URL.',
@@ -654,7 +737,7 @@
         burgundy: 'Borgoña',
         slate: 'Pizarra',
         support: 'Soporte',
-        contactSupport: 'CONTACTAR A SOPORTE Fernando Carranza'
+        contactSupport: 'CONTACTAR A SOPORTE'
       },
       en: {
         title: 'Cristian Bautista Accounting',
@@ -688,6 +771,11 @@
         notesPh: 'Operation #, invoice, notes...',
         saveIn: 'Save Income',
         saveOut: 'Save Expense',
+        confirmTitle: 'Confirm entry',
+        confirmDesc: 'Do you want to save this transaction to Google Sheets?',
+        confirmType: 'Type',
+        confirmCancel: 'Cancel',
+        confirmAccept: 'Confirm',
         savingMsg: 'Please wait while it is recorded in the system',
         savedOk: 'Entry saved!',
         saveErr: 'Error saving. Check the URL.',
@@ -710,7 +798,7 @@
         burgundy: 'Burgundy',
         slate: 'Slate',
         support: 'Support',
-        contactSupport: 'CONTACT SUPPORT Fernando Carranza'
+        contactSupport: 'CONTACT SUPPORT'
       }
     };
 
@@ -724,6 +812,7 @@
     let mostrarTodos = false;
     let todosMovimientos = [];
     let catalogos = { metodosPago: [], catIngresos: [], catEgresos: [] };
+    let payloadPendiente = null;
 
     const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -797,6 +886,10 @@
       document.getElementById('lbl-method').textContent = t.method;
       document.getElementById('lbl-notes').textContent = t.notes;
       document.getElementById('observaciones').placeholder = t.notesPh;
+      document.getElementById('confirm-title').textContent = t.confirmTitle;
+      document.getElementById('confirm-desc').textContent = t.confirmDesc;
+      document.getElementById('btn-cancel-confirm').textContent = t.confirmCancel;
+      document.getElementById('btn-accept-confirm').textContent = t.confirmAccept;
       document.getElementById('saving-message').textContent = t.savingMsg;
 
       document.getElementById('settings-title').textContent = t.settings;
@@ -852,6 +945,32 @@
 
     function cerrarSiFondo(e) {
       if (e.target.id === 'settings-modal') cerrarConfiguracion();
+    }
+
+    function abrirConfirmacion(payload) {
+      const t = I18N[prefs.lang] || I18N.es;
+      payloadPendiente = payload;
+      const entidadLabel = payload.tipo === 'Ingreso' ? t.origin : t.establishment;
+      const montoFmt = `S/ ${Number(payload.monto || 0).toFixed(2)}`;
+
+      document.getElementById('confirm-summary').innerHTML = `
+        <div class="confirm-line"><span>${t.confirmType}:</span><strong>${payload.tipo}</strong></div>
+        <div class="confirm-line"><span>${t.amount}:</span><strong>${montoFmt}</strong></div>
+        <div class="confirm-line"><span>${entidadLabel}:</span><strong>${payload.entidad}</strong></div>
+        <div class="confirm-line"><span>${t.desc}:</span><strong>${payload.descripcion}</strong></div>
+        <div class="confirm-line"><span>${t.cat}:</span><strong>${payload.categoria}</strong></div>
+        <div class="confirm-line"><span>${t.method}:</span><strong>${payload.metodoPago}</strong></div>
+      `;
+      document.getElementById('confirm-modal').classList.add('active');
+    }
+
+    function cancelarGuardado() {
+      payloadPendiente = null;
+      document.getElementById('confirm-modal').classList.remove('active');
+    }
+
+    function cerrarConfirmacionSiFondo(e) {
+      if (e.target.id === 'confirm-modal') cancelarGuardado();
     }
 
     function mostrarBloqueoGuardado(activo) {
@@ -1035,7 +1154,6 @@
     async function cargarDatos() {
       const t = I18N[prefs.lang] || I18N.es;
 
-      // Pintar caché al instante si existe
       try {
         const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
         if (cached && cached.status === 'ok') {
@@ -1061,13 +1179,8 @@
       }
     }
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const t = I18N[prefs.lang] || I18N.es;
-      btn.disabled = true;
-      mostrarBloqueoGuardado(true);
-      statusEl.textContent = t.savingMsg;
-
       const payload = {
         tipo: document.getElementById('tipo').value,
         fecha: document.getElementById('fecha').value,
@@ -1078,6 +1191,19 @@
         monto: document.getElementById('monto').value,
         observaciones: document.getElementById('observaciones').value.trim()
       };
+      abrirConfirmacion(payload);
+    });
+
+    async function ejecutarGuardadoConfirmado() {
+      if (!payloadPendiente) return;
+      const payload = payloadPendiente;
+      payloadPendiente = null;
+      document.getElementById('confirm-modal').classList.remove('active');
+
+      const t = I18N[prefs.lang] || I18N.es;
+      btn.disabled = true;
+      mostrarBloqueoGuardado(true);
+      statusEl.textContent = t.savingMsg;
 
       try {
         await fetch(SCRIPT_URL, {
@@ -1099,7 +1225,7 @@
         btn.disabled = false;
         setTimeout(() => statusEl.textContent = '', 3000);
       }
-    });
+    }
 
     document.querySelectorAll('[data-count]').forEach(b => {
       b.classList.toggle('active', Number(b.getAttribute('data-count')) === prefs.count);
