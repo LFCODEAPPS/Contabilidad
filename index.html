@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cristian Bautista Contabilidad</title>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --navy: #162d59;
+      --text: #0f172a;
+      --muted: #64748b;
+      --green: #15803d;
+      --red: #b91c1c;
+      --border: #cbd5e1;
+    }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: var(--bg); color: var(--text); margin: 0; padding: 14px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 520px; }
+    .header { background: var(--navy); color: #fff; padding: 14px 16px; border-radius: 12px; margin-bottom: 14px; text-align: center; }
+    .header h1 { margin: 0; font-size: 16px; letter-spacing: 0.5px; }
+    .header p { margin: 4px 0 0; font-size: 11px; opacity: 0.85; }
+    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+    .box { background: var(--card); padding: 12px 8px; border-radius: 10px; border: 1px solid var(--border); text-align: center; }
+    .box small { color: var(--muted); font-size: 11px; display: block; font-weight: 600; }
+    .box strong { font-size: 15px; margin-top: 4px; display: block; }
+    .green { color: var(--green); }
+    .red { color: var(--red); }
+    .card { background: var(--card); padding: 16px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 14px; }
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .tab { padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: #f8fafc; font-weight: 700; cursor: pointer; text-align: center; font-size: 14px; }
+    .tab.active-in { background: #dcfce7; border-color: var(--green); color: var(--green); }
+    .tab.active-out { background: #fee2e2; border-color: var(--red); color: var(--red); }
+    .field { margin-bottom: 11px; }
+    label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--muted); }
+    input, select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: #fff; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    button#btn-save { width: 100%; padding: 12px; background: var(--navy); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 4px; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .list { list-style: none; padding: 0; margin: 0; }
+    .item { display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #e2e8f0; gap: 10px; }
+    .item:last-child { border-bottom: none; }
+    .item-info strong { display: block; font-size: 14px; }
+    .item-info span { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .badge { display: inline-block; background: #e2e8f0; color: #334155; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-top: 4px; }
+    .status { text-align: center; font-size: 13px; margin-top: 8px; min-height: 18px; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>CRISTIAN BAUTISTA CONTABILIDAD</h1>
+      <p>GESTIÓN Y REGISTRO DE INGRESOS Y EGRESOS</p>
+    </div>
+
+    <div class="summary">
+      <div class="box"><small>INGRESOS</small><strong id="total-in" class="green">S/ 0.00</strong></div>
+      <div class="box"><small>EGRESOS</small><strong id="total-out" class="red">S/ 0.00</strong></div>
+      <div class="box"><small>SALDO</small><strong id="balance">S/ 0.00</strong></div>
+    </div>
+
+    <div class="card">
+      <div class="tabs">
+        <div id="tab-ingreso" class="tab active-in" onclick="cambiarTipo('Ingreso')">+ INGRESO</div>
+        <div id="tab-egreso" class="tab" onclick="cambiarTipo('Egreso')">- EGRESO</div>
+      </div>
+
+      <form id="tx-form">
+        <input type="hidden" id="tipo" value="Ingreso">
+
+        <div class="row">
+          <div class="field">
+            <label>Fecha</label>
+            <input type="date" id="fecha" required>
+          </div>
+          <div class="field">
+            <label>Monto (S/)</label>
+            <input type="number" id="monto" step="0.01" min="0.01" placeholder="0.00" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label id="label-entidad">Origen</label>
+          <input type="text" id="entidad" placeholder="Ej. Cliente, Pago de servicio..." required>
+        </div>
+
+        <div class="field">
+          <label>Concepto / Descripción</label>
+          <input type="text" id="descripcion" placeholder="Detalle del movimiento..." required>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Categoría</label>
+            <select id="categoria" required>
+              <option value="">Cargando...</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Método de Pago</label>
+            <select id="metodoPago" required>
+              <option value="">Cargando...</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Observaciones (Opcional)</label>
+          <input type="text" id="observaciones" placeholder="N° de operación, factura, notas...">
+        </div>
+
+        <button type="submit" id="btn-save">Guardar Ingreso</button>
+        <div id="status" class="status"></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2 style="margin: 0 0 10px; font-size: 16px;">Últimos Movimientos</h2>
+      <ul id="history" class="list">
+        <li class="item"><span>Sincronizando con Google Sheets...</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxahNRdcA7N3swHzduZO9NYUq4NxtGEfN87sEolkkDrUBM70pT-3trB10TaX30pIeM0/exec';
+
+    let catalogos = {
+      metodosPago: [],
+      catIngresos: [],
+      catEgresos: []
+    };
+
+    document.getElementById('fecha').valueAsDate = new Date();
+    const form = document.getElementById('tx-form');
+    const btn = document.getElementById('btn-save');
+    const statusEl = document.getElementById('status');
+
+    function cambiarTipo(tipo) {
+      document.getElementById('tipo').value = tipo;
+      const tabIn = document.getElementById('tab-ingreso');
+      const tabOut = document.getElementById('tab-egreso');
+      const labelEntidad = document.getElementById('label-entidad');
+      const inputEntidad = document.getElementById('entidad');
+
+      if (tipo === 'Ingreso') {
+        tabIn.className = 'tab active-in';
+        tabOut.className = 'tab';
+        labelEntidad.textContent = 'Origen';
+        inputEntidad.placeholder = 'Ej. Cliente, Pago de servicio...';
+        btn.textContent = 'Guardar Ingreso';
+        llenarSelect('categoria', catalogos.catIngresos);
+      } else {
+        tabOut.className = 'tab active-out';
+        tabIn.className = 'tab';
+        labelEntidad.textContent = 'Cliente / Establecimiento';
+        inputEntidad.placeholder = 'Ej. Grifo, Ferretería, Proveedor...';
+        btn.textContent = 'Guardar Egreso';
+        llenarSelect('categoria', catalogos.catEgresos);
+      }
+    }
+
+    function llenarSelect(idSelect, opciones) {
+      const select = document.getElementById(idSelect);
+      select.innerHTML = '';
+      if (!opciones || opciones.length === 0) {
+        select.innerHTML = '<option value="General">Sin datos en hoja</option>';
+        return;
+      }
+      opciones.forEach(op => {
+        const option = document.createElement('option');
+        option.value = op;
+        option.textContent = op;
+        select.appendChild(option);
+      });
+    }
+
+    async function cargarDatos() {
+      try {
+        const res = await fetch(SCRIPT_URL);
+        const data = await res.json();
+        if (data.status !== 'ok') return;
+
+        catalogos = data.catalogos;
+        llenarSelect('metodoPago', catalogos.metodosPago);
+        const tipoActual = document.getElementById('tipo').value;
+        llenarSelect('categoria', tipoActual === 'Ingreso' ? catalogos.catIngresos : catalogos.catEgresos);
+
+        let ingresos = 0, egresos = 0;
+        const list = document.getElementById('history');
+        list.innerHTML = '';
+
+        data.movimientos.forEach((m, index) => {
+          if (m.tipo === 'Ingreso') ingresos += m.monto;
+          else egresos += m.monto;
+
+          if (index < 20) {
+            const li = document.createElement('li');
+            li.className = 'item';
+            const isIncome = m.tipo === 'Ingreso';
+            li.innerHTML = `
+              <div class="item-info">
+                <strong>${m.descripcion}</strong>
+                <span>${m.fecha} · ${m.entidad}</span>
+                <span class="badge">${m.categoria} · ${m.metodoPago}</span>
+              </div>
+              <strong class="${isIncome ? 'green' : 'red'}" style="white-space: nowrap;">
+                ${isIncome ? '+' : '-'} S/ ${m.monto.toFixed(2)}
+              </strong>
+            `;
+            list.appendChild(li);
+          }
+        });
+
+        if (data.movimientos.length === 0) {
+          list.innerHTML = '<li class="item"><span>Aún no hay registros en las hojas.</span></li>';
+        }
+
+        document.getElementById('total-in').textContent = `S/ ${ingresos.toFixed(2)}`;
+        document.getElementById('total-out').textContent = `S/ ${egresos.toFixed(2)}`;
+        document.getElementById('balance').textContent = `S/ ${(ingresos - egresos).toFixed(2)}`;
+      } catch (err) {
+        document.getElementById('history').innerHTML = '<li class="item"><span>Error al conectar con Google Sheets.</span></li>';
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      statusEl.textContent = 'Guardando en Google Sheets...';
+
+      const payload = {
+        tipo: document.getElementById('tipo').value,
+        fecha: document.getElementById('fecha').value,
+        entidad: document.getElementById('entidad').value.trim(),
+        descripcion: document.getElementById('descripcion').value.trim(),
+        categoria: document.getElementById('categoria').value,
+        metodoPago: document.getElementById('metodoPago').value,
+        monto: document.getElementById('monto').value,
+        observaciones: document.getElementById('observaciones').value.trim()
+      };
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+
+        statusEl.textContent = '¡Registro guardado!';
+        document.getElementById('monto').value = '';
+        document.getElementById('entidad').value = '';
+        document.getElementById('descripcion').value = '';
+        document.getElementById('observaciones').value = '';
+        await cargarDatos();
+      } catch (err) {
+        statusEl.textContent = 'Error al guardar. Verifica la URL.';
+      } finally {
+        btn.disabled = false;
+        setTimeout(() => statusEl.textContent = '', 3000);
+      }
+    });
+
+    cargarDatos();
+  </script>
+</body>
+</html>
