@@ -4,66 +4,115 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cristian Bautista Contabilidad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f1f5f9;
+      --bg: #eceff4;
       --card: #ffffff;
-      --navy: #162d59;
-      --text: #0f172a;
-      --muted: #64748b;
-      --green: #15803d;
-      --red: #b91c1c;
-      --border: #cbd5e1;
+      --ink: #0e2038;
+      --ink-2: #16315a;
+      --text: #14202f;
+      --muted: #5f6f84;
+      --line: #dbe1ea;
+      --field: #f6f8fb;
+      --green: #0d7a4e;
+      --green-soft: #e2f3ec;
+      --red: #b3321f;
+      --red-soft: #fbe9e5;
+      --brass: #c19a4d;
+      --radius: 14px;
     }
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: var(--bg); color: var(--text); margin: 0; padding: 14px; display: flex; justify-content: center; }
+    * { box-sizing: border-box; font-family: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; }
+    body { background: var(--bg); color: var(--text); margin: 0; padding: 0 0 32px; display: flex; justify-content: center; -webkit-font-smoothing: antialiased; }
     .container { width: 100%; max-width: 520px; }
-    .header { background: var(--navy); color: #fff; padding: 14px 16px; border-radius: 12px; margin-bottom: 14px; text-align: center; }
-    .header h1 { margin: 0; font-size: 16px; letter-spacing: 0.5px; }
-    .header p { margin: 4px 0 0; font-size: 11px; opacity: 0.85; }
-    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
-    .box { background: var(--card); padding: 12px 8px; border-radius: 10px; border: 1px solid var(--border); text-align: center; }
-    .box small { color: var(--muted); font-size: 11px; display: block; font-weight: 600; }
-    .box strong { font-size: 15px; margin-top: 4px; display: block; }
+
+    /* Encabezado + resumen */
+    .top { background: linear-gradient(180deg, var(--ink) 0%, var(--ink-2) 100%); color: #fff; padding: 22px 18px 54px; border-radius: 0 0 26px 26px; }
+    .header { display: flex; align-items: center; gap: 12px; }
+    .mark { flex: none; width: 40px; height: 40px; border-radius: 10px; border: 1.5px solid var(--brass); color: var(--brass); display: grid; place-items: center; font-weight: 700; font-size: 15px; letter-spacing: 0.5px; }
+    .header h1 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: 0.1px; line-height: 1.2; }
+    .header p { margin: 3px 0 0; font-size: 12px; color: #aebbd0; font-weight: 400; }
+
+    .summary { margin: -38px 14px 14px; background: var(--card); border-radius: var(--radius); box-shadow: 0 10px 30px rgba(14,32,56,.14); overflow: hidden; display: grid; grid-template-columns: 1fr 1fr; }
+    .box { padding: 14px 16px; text-align: left; }
+    .box small { color: var(--muted); font-size: 12px; display: block; font-weight: 500; }
+    .box strong { font-size: 18px; margin-top: 4px; display: block; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -0.2px; }
+    .box.main { grid-column: 1 / -1; background: #f3f6fa; border-bottom: 1px solid var(--line); padding: 16px; }
+    .box.main strong { font-size: 30px; font-weight: 700; color: var(--ink); letter-spacing: -0.6px; }
+    .box.in { border-right: 1px solid var(--line); }
     .green { color: var(--green); }
     .red { color: var(--red); }
-    .card { background: var(--card); padding: 16px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 14px; }
-    .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
-    .tab { padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: #f8fafc; font-weight: 700; cursor: pointer; text-align: center; font-size: 14px; }
-    .tab.active-in { background: #dcfce7; border-color: var(--green); color: var(--green); }
-    .tab.active-out { background: #fee2e2; border-color: var(--red); color: var(--red); }
-    .field { margin-bottom: 11px; }
-    label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--muted); }
-    input, select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: #fff; }
+
+    /* Tarjetas */
+    .card { background: var(--card); padding: 18px 16px; border-radius: var(--radius); border: 1px solid var(--line); margin: 0 14px 14px; }
+    .card h2 { margin: 0 0 6px !important; font-size: 16px !important; font-weight: 600; color: var(--ink); }
+
+    /* Selector Ingreso / Egreso */
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 18px; background: var(--field); border: 1px solid var(--line); padding: 4px; border-radius: 12px; }
+    .tab { padding: 10px; border: 1px solid transparent; border-radius: 9px; background: transparent; font-weight: 600; cursor: pointer; text-align: center; font-size: 14px; color: var(--muted); transition: background .15s, color .15s, box-shadow .15s; user-select: none; }
+    .tab.active-in { background: var(--green); color: #fff; box-shadow: 0 2px 8px rgba(13,122,78,.3); }
+    .tab.active-out { background: var(--red); color: #fff; box-shadow: 0 2px 8px rgba(179,50,31,.3); }
+
+    /* Formulario */
+    .field { margin-bottom: 14px; }
+    label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--muted); }
+    input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 15px; background: var(--field); color: var(--text); transition: border-color .15s, box-shadow .15s, background .15s; }
+    input::placeholder { color: #98a5b7; }
+    input:focus, select:focus { outline: none; border-color: var(--ink-2); background: #fff; box-shadow: 0 0 0 3px rgba(22,49,90,.14); }
+    select { appearance: none; -webkit-appearance: none; padding-right: 34px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%235f6f84' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+    #monto { font-weight: 600; font-variant-numeric: tabular-nums; }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    button#btn-save { width: 100%; padding: 12px; background: var(--navy); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 4px; }
+
+    button#btn-save { width: 100%; padding: 14px; background: var(--ink); color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 4px; transition: background .15s, transform .1s; }
+    button#btn-save:hover { background: var(--ink-2); }
+    button#btn-save:active { transform: scale(.985); }
     button:disabled { opacity: 0.6; cursor: not-allowed; }
+    button:focus-visible, .tab:focus-visible { outline: 3px solid rgba(193,154,77,.6); outline-offset: 2px; }
+    .status { text-align: center; font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 500; color: var(--muted); }
+
+    /* Movimientos */
     .list { list-style: none; padding: 0; margin: 0; }
-    .item { display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #e2e8f0; gap: 10px; }
-    .item:last-child { border-bottom: none; }
-    .item-info strong { display: block; font-size: 14px; }
-    .item-info span { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .badge { display: inline-block; background: #e2e8f0; color: #334155; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-top: 4px; }
-    .status { text-align: center; font-size: 13px; margin-top: 8px; min-height: 18px; font-weight: 500; }
+    .item { display: flex; justify-content: space-between; align-items: flex-start; padding: 13px 0; border-bottom: 1px solid var(--line); gap: 12px; color: var(--muted); font-size: 14px; }
+    .item:last-child { border-bottom: none; padding-bottom: 2px; }
+    .item-info { min-width: 0; }
+    .item-info strong { display: block; font-size: 14px; font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
+    .item-info span { display: block; font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .item > strong { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; padding: 3px 8px; border-radius: 8px; }
+    .item > strong.green { background: var(--green-soft); }
+    .item > strong.red { background: var(--red-soft); }
+    .item-info span.badge, .badge { display: inline-block; background: #eaeff6; color: #3b4d66; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 999px; margin-top: 6px; }
+
+    @media (max-width: 380px) {
+      .box.main strong { font-size: 26px; }
+      .row { grid-template-columns: 1fr; gap: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <h1>CRISTIAN BAUTISTA CONTABILIDAD</h1>
-      <p>GESTIÓN Y REGISTRO DE INGRESOS Y EGRESOS</p>
+    <div class="top">
+      <div class="header">
+        <div class="mark">CB</div>
+        <div>
+          <h1>Cristian Bautista Contabilidad</h1>
+          <p>Gestión y registro de ingresos y egresos</p>
+        </div>
+      </div>
     </div>
 
     <div class="summary">
-      <div class="box"><small>INGRESOS</small><strong id="total-in" class="green">S/ 0.00</strong></div>
-      <div class="box"><small>EGRESOS</small><strong id="total-out" class="red">S/ 0.00</strong></div>
-      <div class="box"><small>SALDO</small><strong id="balance">S/ 0.00</strong></div>
+      <div class="box main"><small>Saldo</small><strong id="balance">S/ 0.00</strong></div>
+      <div class="box in"><small>Ingresos</small><strong id="total-in" class="green">S/ 0.00</strong></div>
+      <div class="box"><small>Egresos</small><strong id="total-out" class="red">S/ 0.00</strong></div>
     </div>
 
     <div class="card">
       <div class="tabs">
-        <div id="tab-ingreso" class="tab active-in" onclick="cambiarTipo('Ingreso')">+ INGRESO</div>
-        <div id="tab-egreso" class="tab" onclick="cambiarTipo('Egreso')">- EGRESO</div>
+        <div id="tab-ingreso" class="tab active-in" onclick="cambiarTipo('Ingreso')">+ Ingreso</div>
+        <div id="tab-egreso" class="tab" onclick="cambiarTipo('Egreso')">- Egreso</div>
       </div>
 
       <form id="tx-form">
