@@ -795,9 +795,8 @@
         savingMsg: 'Espere mientras se registra en el sistema',
         deletingMsg: 'Espere mientras se elimina el registro',
         savedOk: '¡Registro guardado!',
-        deletedOk: '¡Registro eliminado!',
         saveErr: 'Error al guardar. Verifica la URL.',
-        deleteErr: 'Error al eliminar el registro.',
+        deleteErr: 'Error al eliminar en Google Sheets. Revisa tu Apps Script.',
         syncing: 'Sincronizando con Google Sheets...',
         connErr: 'Error al conectar con Google Sheets.',
         emptyHist: 'Aún no hay registros en las hojas.',
@@ -865,9 +864,8 @@
         savingMsg: 'Please wait while it is recorded in the system',
         deletingMsg: 'Please wait while the entry is deleted',
         savedOk: 'Entry saved!',
-        deletedOk: 'Entry deleted!',
         saveErr: 'Error saving. Check the URL.',
-        deleteErr: 'Error deleting the entry.',
+        deleteErr: 'Error deleting in Google Sheets. Check your Apps Script.',
         syncing: 'Syncing with Google Sheets...',
         connErr: 'Error connecting to Google Sheets.',
         emptyHist: 'No records in the sheets yet.',
@@ -901,7 +899,7 @@
     let mostrarTodos = false;
     let todosMovimientos = [];
     let catalogos = { metodosPago: [], catIngresos: [], catEgresos: [] };
-    let accionPendiente = null; // { mode: 'save' | 'delete', payload: object }
+    let accionPendiente = null;
 
     const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -1085,8 +1083,8 @@
       const payload = {
         action: 'delete',
         index,
-        row: mov.row || mov.fila || '',
-        id: mov.id || '',
+        sheetRow: mov.sheetRow || mov.rowIndex || '',
+        rowIndex: mov.rowIndex || mov.sheetRow || '',
         tipo: mov.tipo || '',
         fecha: mov.fecha || '',
         entidad: mov.entidad || '',
@@ -1200,6 +1198,22 @@
       select.value = '';
     }
 
+    function recalcularTotalesYRender() {
+      let ingresos = 0, egresos = 0;
+      todosMovimientos.forEach(m => {
+        const monto = Number(m.monto) || 0;
+        if (m.tipo === 'Ingreso') ingresos += monto;
+        else egresos += monto;
+      });
+
+      document.getElementById('total-in').textContent = `S/ ${ingresos.toFixed(2)}`;
+      document.getElementById('total-out').textContent = `S/ ${egresos.toFixed(2)}`;
+      document.getElementById('balance').textContent = `S/ ${(ingresos - egresos).toFixed(2)}`;
+
+      renderHistorial();
+      renderGraficos();
+    }
+
     function renderHistorial() {
       const t = I18N[prefs.lang] || I18N.es;
       const list = document.getElementById('history');
@@ -1306,19 +1320,7 @@
       llenarSelect('categoria', tipoActual === 'Ingreso' ? catalogos.catIngresos : catalogos.catEgresos);
 
       todosMovimientos = data.movimientos || [];
-      let ingresos = 0, egresos = 0;
-      todosMovimientos.forEach(m => {
-        const monto = Number(m.monto) || 0;
-        if (m.tipo === 'Ingreso') ingresos += monto;
-        else egresos += monto;
-      });
-
-      document.getElementById('total-in').textContent = `S/ ${ingresos.toFixed(2)}`;
-      document.getElementById('total-out').textContent = `S/ ${egresos.toFixed(2)}`;
-      document.getElementById('balance').textContent = `S/ ${(ingresos - egresos).toFixed(2)}`;
-
-      renderHistorial();
-      renderGraficos();
+      recalcularTotalesYRender();
     }
 
     async function cargarDatos() {
@@ -1412,6 +1414,12 @@
       const t = I18N[prefs.lang] || I18N.es;
       mostrarBloqueoProceso(true, t.deletingMsg);
 
+      const respaldo = [...todosMovimientos];
+      if (typeof payload.index === 'number' && payload.index >= 0) {
+        todosMovimientos.splice(payload.index, 1);
+      }
+      recalcularTotalesYRender();
+
       try {
         const res = await fetch(SCRIPT_URL, {
           method: 'POST',
@@ -1419,15 +1427,25 @@
           body: JSON.stringify(payload)
         });
         const text = await res.text();
+        let parsed = null;
         try {
-          const parsed = JSON.parse(text);
-          if (parsed && parsed.status === 'error') {
-            throw new Error(parsed.message || t.deleteErr);
-          }
+          parsed = JSON.parse(text);
         } catch (_) {}
+
+        if (parsed && parsed.status === 'error') {
+          throw new Error(parsed.message || t.deleteErr);
+        }
+
+        const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+        if (cached && cached.status === 'ok') {
+          cached.movimientos = [...todosMovimientos];
+          localStorage.setItem(CACHE_KEY, JSON.stringify(cached));
+        }
 
         await cargarDatos();
       } catch (err) {
+        todosMovimientos = respaldo;
+        recalcularTotalesYRender();
         alert(t.deleteErr);
       } finally {
         mostrarBloqueoProceso(false);
