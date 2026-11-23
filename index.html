@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#0e2038">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Contabilidad CB">
+  <meta name="apple-mobile-web-app-title" content="Cristhian Bautista">
   <link id="favicon-img" rel="icon" type="image/jpeg" href="money.jpg">
   <link id="apple-icon-img" rel="apple-touch-icon" href="money.jpg">
-  <title>Cristian Bautista Contabilidad</title>
+  <title>Cristhian Bautista</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -226,14 +226,35 @@
     .item-info { min-width: 0; }
     .item-info strong { display: block; font-size: 14px; font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
     .item-info span { display: block; font-size: 12px; color: var(--muted); margin-top: 3px; }
-    .item > strong { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; padding: 3px 8px; border-radius: 8px; }
-    .item > strong.green { background: var(--green-soft); }
-    .item > strong.red { background: var(--red-soft); }
+    .item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex: none; }
+    .item-amount { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; padding: 3px 8px; border-radius: 8px; white-space: nowrap; }
+    .item-amount.green { color: var(--green); background: var(--green-soft); }
+    .item-amount.red { color: var(--red); background: var(--red-soft); }
     .item-info span.badge, .badge { display: inline-block; background: var(--badge-bg); color: var(--badge-text); font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 999px; margin-top: 6px; }
+
+    .btn-delete-tx {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      display: inline-grid;
+      place-items: center;
+      cursor: pointer;
+      padding: 0;
+      transition: color .15s, background .15s, border-color .15s, transform .1s;
+    }
+    .btn-delete-tx:hover {
+      color: var(--red);
+      background: var(--red-soft);
+      border-color: rgba(179, 50, 31, 0.25);
+    }
+    .btn-delete-tx:active { transform: scale(.92); }
 
     .history-footer { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); display: flex; justify-content: center; }
 
-    /* Overlay de bloqueo al guardar (símbolo $ verde girando) */
+    /* Overlay de bloqueo al guardar/borrar (símbolo $ verde girando) */
     .saving-overlay {
       position: fixed;
       inset: 0;
@@ -284,7 +305,7 @@
       line-height: 1.4;
     }
 
-    /* Cuadro de confirmación antes de guardar */
+    /* Cuadro de confirmación antes de guardar o borrar */
     .confirm-modal {
       position: fixed;
       inset: 0;
@@ -346,6 +367,8 @@
       cursor: pointer;
     }
     .btn-accept-confirm:hover { background: var(--ink-2); }
+    .btn-accept-confirm.danger { background: var(--red); }
+    .btn-accept-confirm.danger:hover { filter: brightness(0.92); }
 
     /* Modal de Configuración */
     .settings-modal {
@@ -470,7 +493,7 @@
           <div class="header-left">
             <div class="mark">CB</div>
             <div>
-              <h1 id="app-title">Cristian Bautista Contabilidad</h1>
+              <h1 id="app-title">Cristhian Bautista</h1>
               <p id="app-subtitle">Gestión y registro de ingresos y egresos</p>
             </div>
           </div>
@@ -614,20 +637,20 @@
     </div>
   </div>
 
-  <!-- DIÁLOGO DE CONFIRMACIÓN ANTES DE GUARDAR -->
+  <!-- DIÁLOGO DE CONFIRMACIÓN ANTES DE GUARDAR O ELIMINAR -->
   <div id="confirm-modal" class="confirm-modal" onclick="cerrarConfirmacionSiFondo(event)">
     <div class="confirm-box" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
       <h3 id="confirm-title">Confirmar registro</h3>
       <p class="confirm-desc" id="confirm-desc">¿Deseas guardar este movimiento en Google Sheets?</p>
       <div class="confirm-summary" id="confirm-summary"></div>
       <div class="confirm-actions">
-        <button type="button" class="btn-cancel-confirm" id="btn-cancel-confirm" onclick="cancelarGuardado()">Cancelar</button>
-        <button type="button" class="btn-accept-confirm" id="btn-accept-confirm" onclick="ejecutarGuardadoConfirmado()">Confirmar</button>
+        <button type="button" class="btn-cancel-confirm" id="btn-cancel-confirm" onclick="cancelarConfirmacion()">Cancelar</button>
+        <button type="button" class="btn-accept-confirm" id="btn-accept-confirm" onclick="ejecutarConfirmacion()">Confirmar</button>
       </div>
     </div>
   </div>
 
-  <!-- BLOQUEO MIENTRAS GUARDA -->
+  <!-- BLOQUEO MIENTRAS GUARDA O ELIMINA -->
   <div id="saving-overlay" class="saving-overlay" aria-live="assertive" aria-modal="true">
     <div class="saving-box">
       <div class="dollar-spinner">$</div>
@@ -693,7 +716,7 @@
 
       <div class="setting-group" style="margin-bottom:0;">
         <span class="setting-label" id="lbl-set-support">Soporte</span>
-        <a class="support-link" href="mailto:Ferdoctus@iCloud.com?subject=Soporte%20-%20Cristian%20Bautista%20Contabilidad&body=Hola%20Fernando%20Carranza%2C%20necesito%20ayuda%20con%20la%20aplicaci%C3%B3n.">
+        <a class="support-link" href="mailto:Ferdoctus@iCloud.com?subject=Soporte%20-%20Cristhian%20Bautista&body=Hola%20Fernando%20Carranza%2C%20necesito%20ayuda%20con%20la%20aplicaci%C3%B3n.">
           <div>
             <span id="lbl-contact-support">CONTACTAR A SOPORTE</span>
             <span class="support-name">Fernando Carranza</span>
@@ -727,7 +750,7 @@
 
     const I18N = {
       es: {
-        title: 'Cristian Bautista Contabilidad',
+        title: 'Cristhian Bautista',
         subtitle: 'Gestión y registro de ingresos y egresos',
         balance: 'Saldo',
         fullData: 'Data completa',
@@ -740,6 +763,7 @@
         recentSub: 'Movimientos recientes sincronizados',
         showAll: 'Mostrar todos',
         showLess: 'Ver menos',
+        deleteTx: 'Eliminar registro',
         chartIn: 'Gráfico de Ingresos por Categoría',
         chartInSub: 'Distribución acumulada de tus ingresos',
         chartOut: 'Gráfico de Egresos por Categoría',
@@ -762,12 +786,18 @@
         saveOut: 'Guardar Egreso',
         confirmTitle: 'Confirmar registro',
         confirmDesc: '¿Deseas guardar este movimiento en Google Sheets?',
+        confirmDeleteTitle: 'Confirmar eliminación',
+        confirmDeleteDesc: '¿Deseas eliminar este movimiento de Google Sheets?',
         confirmType: 'Tipo',
         confirmCancel: 'Cancelar',
         confirmAccept: 'Confirmar',
+        confirmDeleteAccept: 'Eliminar',
         savingMsg: 'Espere mientras se registra en el sistema',
+        deletingMsg: 'Espere mientras se elimina el registro',
         savedOk: '¡Registro guardado!',
+        deletedOk: '¡Registro eliminado!',
         saveErr: 'Error al guardar. Verifica la URL.',
+        deleteErr: 'Error al eliminar el registro.',
         syncing: 'Sincronizando con Google Sheets...',
         connErr: 'Error al conectar con Google Sheets.',
         emptyHist: 'Aún no hay registros en las hojas.',
@@ -790,7 +820,7 @@
         contactSupport: 'CONTACTAR A SOPORTE'
       },
       en: {
-        title: 'Cristian Bautista Accounting',
+        title: 'Cristhian Bautista',
         subtitle: 'Income and expense tracking & management',
         balance: 'Balance',
         fullData: 'Full data',
@@ -803,6 +833,7 @@
         recentSub: 'Recently synced transactions',
         showAll: 'Show all',
         showLess: 'Show less',
+        deleteTx: 'Delete entry',
         chartIn: 'Income Chart by Category',
         chartInSub: 'Cumulative breakdown of your income',
         chartOut: 'Expense Chart by Category',
@@ -825,12 +856,18 @@
         saveOut: 'Save Expense',
         confirmTitle: 'Confirm entry',
         confirmDesc: 'Do you want to save this transaction to Google Sheets?',
+        confirmDeleteTitle: 'Confirm deletion',
+        confirmDeleteDesc: 'Do you want to delete this transaction from Google Sheets?',
         confirmType: 'Type',
         confirmCancel: 'Cancel',
         confirmAccept: 'Confirm',
+        confirmDeleteAccept: 'Delete',
         savingMsg: 'Please wait while it is recorded in the system',
+        deletingMsg: 'Please wait while the entry is deleted',
         savedOk: 'Entry saved!',
+        deletedOk: 'Entry deleted!',
         saveErr: 'Error saving. Check the URL.',
+        deleteErr: 'Error deleting the entry.',
         syncing: 'Syncing with Google Sheets...',
         connErr: 'Error connecting to Google Sheets.',
         emptyHist: 'No records in the sheets yet.',
@@ -864,7 +901,7 @@
     let mostrarTodos = false;
     let todosMovimientos = [];
     let catalogos = { metodosPago: [], catIngresos: [], catEgresos: [] };
-    let payloadPendiente = null;
+    let accionPendiente = null; // { mode: 'save' | 'delete', payload: object }
 
     const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -918,6 +955,7 @@
     function aplicarIdioma() {
       const t = I18N[prefs.lang] || I18N.es;
       document.documentElement.lang = prefs.lang;
+      document.title = t.title;
 
       document.getElementById('app-title').textContent = t.title;
       document.getElementById('app-subtitle').textContent = t.subtitle;
@@ -943,11 +981,7 @@
       document.getElementById('lbl-method').textContent = t.method;
       document.getElementById('lbl-notes').textContent = t.notes;
       document.getElementById('observaciones').placeholder = t.notesPh;
-      document.getElementById('confirm-title').textContent = t.confirmTitle;
-      document.getElementById('confirm-desc').textContent = t.confirmDesc;
       document.getElementById('btn-cancel-confirm').textContent = t.confirmCancel;
-      document.getElementById('btn-accept-confirm').textContent = t.confirmAccept;
-      document.getElementById('saving-message').textContent = t.savingMsg;
 
       document.getElementById('settings-title').textContent = t.settings;
       document.getElementById('btn-close-settings').textContent = t.close;
@@ -971,6 +1005,7 @@
 
       actualizarTextosTipo(document.getElementById('tipo').value);
       actualizarBotonesToggle();
+      renderHistorial();
     }
 
     function setIdioma(idioma) {
@@ -1004,9 +1039,8 @@
       if (e.target.id === 'settings-modal') cerrarConfiguracion();
     }
 
-    function abrirConfirmacion(payload) {
+    function construirResumenConfirmacion(payload) {
       const t = I18N[prefs.lang] || I18N.es;
-      payloadPendiente = payload;
       const entidadLabel = payload.tipo === 'Ingreso' ? t.origin : t.establishment;
       const montoFmt = `S/ ${Number(payload.monto || 0).toFixed(2)}`;
 
@@ -1014,6 +1048,9 @@
         <div class="confirm-line"><span>${t.confirmType}:</span><strong>${payload.tipo}</strong></div>
         <div class="confirm-line"><span>${t.amount}:</span><strong>${montoFmt}</strong></div>
       `;
+      if (payload.fecha) {
+        html += `<div class="confirm-line"><span>${t.date}:</span><strong>${payload.fecha}</strong></div>`;
+      }
       if (payload.entidad) {
         html += `<div class="confirm-line"><span>${entidadLabel}:</span><strong>${payload.entidad}</strong></div>`;
       }
@@ -1026,21 +1063,62 @@
       if (payload.metodoPago) {
         html += `<div class="confirm-line"><span>${t.method}:</span><strong>${payload.metodoPago}</strong></div>`;
       }
+      return html;
+    }
 
-      document.getElementById('confirm-summary').innerHTML = html;
+    function abrirConfirmacionGuardado(payload) {
+      const t = I18N[prefs.lang] || I18N.es;
+      accionPendiente = { mode: 'save', payload };
+      document.getElementById('confirm-title').textContent = t.confirmTitle;
+      document.getElementById('confirm-desc').textContent = t.confirmDesc;
+      document.getElementById('confirm-summary').innerHTML = construirResumenConfirmacion(payload);
+      const acceptBtn = document.getElementById('btn-accept-confirm');
+      acceptBtn.textContent = t.confirmAccept;
+      acceptBtn.classList.remove('danger');
       document.getElementById('confirm-modal').classList.add('active');
     }
 
-    function cancelarGuardado() {
-      payloadPendiente = null;
+    function solicitarEliminacion(index) {
+      const mov = todosMovimientos[index];
+      if (!mov) return;
+      const t = I18N[prefs.lang] || I18N.es;
+      const payload = {
+        action: 'delete',
+        index,
+        row: mov.row || mov.fila || '',
+        id: mov.id || '',
+        tipo: mov.tipo || '',
+        fecha: mov.fecha || '',
+        entidad: mov.entidad || '',
+        descripcion: mov.descripcion || '',
+        categoria: mov.categoria || '',
+        metodoPago: mov.metodoPago || '',
+        monto: mov.monto || 0,
+        observaciones: mov.observaciones || ''
+      };
+      accionPendiente = { mode: 'delete', payload };
+      document.getElementById('confirm-title').textContent = t.confirmDeleteTitle;
+      document.getElementById('confirm-desc').textContent = t.confirmDeleteDesc;
+      document.getElementById('confirm-summary').innerHTML = construirResumenConfirmacion(payload);
+      const acceptBtn = document.getElementById('btn-accept-confirm');
+      acceptBtn.textContent = t.confirmDeleteAccept;
+      acceptBtn.classList.add('danger');
+      document.getElementById('confirm-modal').classList.add('active');
+    }
+
+    function cancelarConfirmacion() {
+      accionPendiente = null;
       document.getElementById('confirm-modal').classList.remove('active');
     }
 
     function cerrarConfirmacionSiFondo(e) {
-      if (e.target.id === 'confirm-modal') cancelarGuardado();
+      if (e.target.id === 'confirm-modal') cancelarConfirmacion();
     }
 
-    function mostrarBloqueoGuardado(activo) {
+    function mostrarBloqueoProceso(activo, mensaje) {
+      if (mensaje) {
+        document.getElementById('saving-message').textContent = mensaje;
+      }
       document.getElementById('saving-overlay').classList.toggle('active', activo);
     }
 
@@ -1144,7 +1222,8 @@
 
       const visibles = mostrarTodos ? todosMovimientos : todosMovimientos.slice(0, prefs.count);
 
-      visibles.forEach(m => {
+      visibles.forEach((m, idx) => {
+        const realIndex = mostrarTodos ? idx : todosMovimientos.indexOf(m);
         const li = document.createElement('li');
         li.className = 'item';
         const isIncome = m.tipo === 'Ingreso';
@@ -1154,9 +1233,20 @@
             <span>${m.fecha}${m.entidad ? ' · ' + m.entidad : ''}</span>
             <span class="badge">${m.categoria || 'General'}${m.metodoPago ? ' · ' + m.metodoPago : ''}</span>
           </div>
-          <strong class="${isIncome ? 'green' : 'red'}" style="white-space: nowrap;">
-            ${isIncome ? '+' : '-'} S/ ${Number(m.monto || 0).toFixed(2)}
-          </strong>
+          <div class="item-right">
+            <strong class="item-amount ${isIncome ? 'green' : 'red'}">
+              ${isIncome ? '+' : '-'} S/ ${Number(m.monto || 0).toFixed(2)}
+            </strong>
+            <button type="button" class="btn-delete-tx" aria-label="${t.deleteTx}" title="${t.deleteTx}" onclick="solicitarEliminacion(${realIndex})">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                <path d="M10 11v6"></path>
+                <path d="M14 11v6"></path>
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+              </svg>
+            </button>
+          </div>
         `;
         list.appendChild(li);
       });
@@ -1262,6 +1352,7 @@
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const payload = {
+        action: 'create',
         tipo: document.getElementById('tipo').value,
         fecha: document.getElementById('fecha').value,
         entidad: document.getElementById('entidad').value.trim(),
@@ -1271,18 +1362,26 @@
         monto: document.getElementById('monto').value,
         observaciones: document.getElementById('observaciones').value.trim()
       };
-      abrirConfirmacion(payload);
+      abrirConfirmacionGuardado(payload);
     });
 
-    async function ejecutarGuardadoConfirmado() {
-      if (!payloadPendiente) return;
-      const payload = payloadPendiente;
-      payloadPendiente = null;
+    async function ejecutarConfirmacion() {
+      if (!accionPendiente) return;
+      const actual = accionPendiente;
+      accionPendiente = null;
       document.getElementById('confirm-modal').classList.remove('active');
 
+      if (actual.mode === 'save') {
+        await ejecutarGuardadoConfirmado(actual.payload);
+      } else if (actual.mode === 'delete') {
+        await ejecutarEliminacionConfirmada(actual.payload);
+      }
+    }
+
+    async function ejecutarGuardadoConfirmado(payload) {
       const t = I18N[prefs.lang] || I18N.es;
       btn.disabled = true;
-      mostrarBloqueoGuardado(true);
+      mostrarBloqueoProceso(true, t.savingMsg);
       statusEl.textContent = t.savingMsg;
 
       try {
@@ -1303,9 +1402,35 @@
       } catch (err) {
         statusEl.textContent = t.saveErr;
       } finally {
-        mostrarBloqueoGuardado(false);
+        mostrarBloqueoProceso(false);
         btn.disabled = false;
         setTimeout(() => statusEl.textContent = '', 3000);
+      }
+    }
+
+    async function ejecutarEliminacionConfirmada(payload) {
+      const t = I18N[prefs.lang] || I18N.es;
+      mostrarBloqueoProceso(true, t.deletingMsg);
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+        const text = await res.text();
+        try {
+          const parsed = JSON.parse(text);
+          if (parsed && parsed.status === 'error') {
+            throw new Error(parsed.message || t.deleteErr);
+          }
+        } catch (_) {}
+
+        await cargarDatos();
+      } catch (err) {
+        alert(t.deleteErr);
+      } finally {
+        mostrarBloqueoProceso(false);
       }
     }
 
