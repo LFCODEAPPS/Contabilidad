@@ -96,11 +96,12 @@
     .top { background: linear-gradient(180deg, var(--ink) 0%, var(--ink-2) 100%); color: #fff; padding: 18px 18px 48px; border-radius: 0 0 24px 24px; }
     .header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .header-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .header-actions { display: flex; align-items: center; gap: 8px; flex: none; }
     .mark { flex: none; width: 40px; height: 40px; border-radius: 10px; border: 1.5px solid var(--brass); color: var(--brass); display: grid; place-items: center; font-weight: 700; font-size: 15px; letter-spacing: 0.5px; }
     .header h1 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: 0.1px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .header p { margin: 3px 0 0; font-size: 12px; color: rgba(255,255,255,0.75); font-weight: 400; }
 
-    .btn-gear {
+    .btn-icon {
       flex: none;
       width: 38px;
       height: 38px;
@@ -113,7 +114,8 @@
       cursor: pointer;
       transition: background .15s, transform .15s;
     }
-    .btn-gear:hover { background: rgba(255,255,255,0.2); }
+    .btn-icon:hover { background: rgba(255,255,255,0.2); }
+    .btn-icon:active { transform: scale(.94); }
     .btn-gear:active { transform: scale(.94) rotate(25deg); }
 
     .summary { margin: -36px 14px 8px; background: var(--card); border-radius: var(--radius); box-shadow: 0 10px 26px rgba(0,0,0,.14); overflow: hidden; display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); }
@@ -472,12 +474,20 @@
               <p id="app-subtitle">Gestión y registro de ingresos y egresos</p>
             </div>
           </div>
-          <button type="button" class="btn-gear" id="btn-open-settings" aria-label="Configuración" onclick="abrirConfiguracion()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-            </svg>
-          </button>
+          <div class="header-actions">
+            <button type="button" class="btn-icon" id="btn-reload-page" aria-label="Recargar página" onclick="recargarPaginaCompleta()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+              </svg>
+            </button>
+            <button type="button" class="btn-icon btn-gear" id="btn-open-settings" aria-label="Configuración" onclick="abrirConfiguracion()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -544,7 +554,7 @@
     <!-- PANTALLA DE REGISTROS: VOLVER + FORMULARIO -->
     <div id="view-registros" class="view">
       <div class="nav-wrap">
-        <button type="button" class="btn-nav btn-secondary" id="btn-back-charts" onclick="mostrarVista('charts')">← Volver a gráficos</button>
+        <button type="button" class="btn-nav btn-secondary" id="btn-back-charts" onclick="mostrarVista('charts')">← Volver a Inicio</button>
       </div>
 
       <div class="card">
@@ -581,13 +591,13 @@
             <div class="field">
               <label for="categoria" id="lbl-cat">Categoría</label>
               <select id="categoria">
-                <option value="">Cargando...</option>
+                <option value="" selected disabled>Seleccionar...</option>
               </select>
             </div>
             <div class="field">
               <label for="metodoPago" id="lbl-method">Método de Pago</label>
               <select id="metodoPago">
-                <option value="">Cargando...</option>
+                <option value="" selected disabled>Seleccionar...</option>
               </select>
             </div>
           </div>
@@ -724,7 +734,8 @@
         incomes: 'Ingresos',
         expenses: 'Egresos',
         goRecords: 'Ir a registros →',
-        backCharts: '← Volver a gráficos',
+        backCharts: '← Volver a Inicio',
+        selectPlaceholder: 'Seleccionar...',
         recent: 'Últimos Movimientos',
         recentSub: 'Movimientos recientes sincronizados',
         showAll: 'Mostrar todos',
@@ -786,7 +797,8 @@
         incomes: 'Income',
         expenses: 'Expenses',
         goRecords: 'Go to records →',
-        backCharts: '← Back to charts',
+        backCharts: '← Back to Home',
+        selectPlaceholder: 'Select...',
         recent: 'Recent Transactions',
         recentSub: 'Recently synced transactions',
         showAll: 'Show all',
@@ -855,6 +867,10 @@
     let payloadPendiente = null;
 
     const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function recargarPaginaCompleta() {
+      window.location.reload();
+    }
 
     function aplicarTema() {
       const esOscuro = prefs.theme === 'dark' || (prefs.theme === 'auto' && darkMediaQuery.matches);
@@ -1031,6 +1047,11 @@
     function mostrarVista(vista) {
       const chartsView = document.getElementById('view-charts');
       const registrosView = document.getElementById('view-registros');
+      document.getElementById('confirm-modal').classList.remove('active');
+      document.getElementById('saving-overlay').classList.remove('active');
+      if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        document.activeElement.blur();
+      }
       if (vista === 'registros') {
         chartsView.classList.remove('active');
         registrosView.classList.add('active');
@@ -1038,7 +1059,7 @@
         registrosView.classList.remove('active');
         chartsView.classList.add('active');
       }
-      window.scrollTo({ top: 0, behavior: 'instant' });
+      window.scrollTo(0, 0);
     }
 
     document.getElementById('fecha').valueAsDate = new Date();
@@ -1079,22 +1100,26 @@
     }
 
     function llenarSelect(idSelect, opciones) {
+      const t = I18N[prefs.lang] || I18N.es;
       const select = document.getElementById(idSelect);
-      const valorPrevio = select.value;
       select.innerHTML = '';
-      if (!opciones || opciones.length === 0) {
-        select.innerHTML = '<option value="General">Sin datos en hoja</option>';
-        return;
-      }
+
+      const placeholderOption = document.createElement('option');
+      placeholderOption.value = '';
+      placeholderOption.textContent = t.selectPlaceholder;
+      placeholderOption.disabled = true;
+      placeholderOption.selected = true;
+      select.appendChild(placeholderOption);
+
+      if (!opciones || opciones.length === 0) return;
+
       opciones.forEach(op => {
         const option = document.createElement('option');
         option.value = op;
         option.textContent = op;
         select.appendChild(option);
       });
-      if (valorPrevio && opciones.includes(valorPrevio)) {
-        select.value = valorPrevio;
-      }
+      select.value = '';
     }
 
     function renderHistorial() {
@@ -1271,6 +1296,8 @@
         document.getElementById('monto').value = '';
         document.getElementById('entidad').value = '';
         document.getElementById('descripcion').value = '';
+        document.getElementById('categoria').value = '';
+        document.getElementById('metodoPago').value = '';
         document.getElementById('observaciones').value = '';
         await cargarDatos();
       } catch (err) {
